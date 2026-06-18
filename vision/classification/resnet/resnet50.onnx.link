@@ -1,0 +1,1 @@
+https://huggingface.co/onnx-community/resnet-50-ONNX/blob/main/onnx/model.onnx -o resnet50.onnx
