@@ -16,11 +16,12 @@ datasets:
 ## Table of Contents
 - [Introduction](#introduction)
 - [Model Details](#model-details)
-- [Setup & Installation](#setup--installation)
+- [Setup and Installation](#setup-and-installation)
 - [Usage](#usage)
 - [Citation](#citation)
 - [Additional Resources](#additional-resources)
 
+<a name="introduction"></a>
 ## Introduction
 
 🚀 **Ready-to-deploy image classification for TI edge devices**
@@ -35,6 +36,7 @@ This ResNet-50 model is specifically optimized for **Texas Instruments MPU (Micr
 
 ---
 
+<a name="model-details"></a>
 ## Model Details
 
 ---
@@ -43,7 +45,8 @@ This ResNet-50 model is specifically optimized for **Texas Instruments MPU (Micr
 |ImageNet |ResNet-50 v1.5 |`cl-6110`|224x224 |~25.6 M |4.1 |76.15 |Y  | |
 ---
 
-## Setup & Installation
+<a name="setup-and-installation"></a>
+## Setup and Installation
 
 ### Requirements
 ```bash
@@ -54,6 +57,7 @@ pip install onnxruntime>=1.23.2
 #### For TI hardware deployment
 Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)**
 
+<a name="usage"></a>
 ## Usage
 
 ### Model Download
@@ -61,7 +65,7 @@ The model can be downloaded automatically using the provided scripts:
 
 ```bash
 # Prepare the model with shape fixing
-python prepare_model.py resnet50.onnx.link
+python prepare_model.py --link-file resnet50.onnx.link
 ```
 
 The `.link` file contains the HuggingFace model URL and will automatically:
@@ -102,6 +106,7 @@ tidlrunner-cli evaluate --target_device J784S4 --config_path \
 
 **Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)
 
+<a name="citation"></a>
 ## Citation
 
 If you use this model in your research or applications, please cite:
@@ -116,6 +121,7 @@ If you use this model in your research or applications, please cite:
 }
 ```
 
+<a name="additional-resources"></a>
 ## Additional Resources
 
 ### Tools & Frameworks
