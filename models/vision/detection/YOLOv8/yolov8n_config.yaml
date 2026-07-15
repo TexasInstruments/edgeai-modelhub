@@ -9,7 +9,7 @@ preprocess:
   interpolation: null
   resize_with_pad:
   - true
-  - corner
+  - center
   pad_color:
   - 114
   - 114
@@ -40,7 +40,9 @@ postprocess:
   reshape_list: null
   formatter: 
       name: DetectionXYWH2XYXYCenterXY
-  resize_with_pad: true
+  resize_with_pad:
+  - true
+  - center
   normalized_detections: false
   shuffle_indices: null
   squeeze_axis: null
