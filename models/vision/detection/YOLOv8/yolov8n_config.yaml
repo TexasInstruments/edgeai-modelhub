@@ -37,23 +37,20 @@ session:
   output_details: null
   num_inputs: 1
 postprocess:
-  reshape_list:
-  - - -1
-    - 6
-  formatter:
-    src_indices:
-    - 5
-    - 4
-    dst_indices:
-    - 4
-    - 5
-    name: DetectionBoxSL2BoxLS
+  reshape_list: null
+  formatter: 
+      name: DetectionXYWH2XYXYCenterXY
   resize_with_pad: true
   normalized_detections: false
   shuffle_indices: null
   squeeze_axis: null
   ignore_index: null
-  logits_bbox_to_bbox_ls: false
+  model_output_type: combined
+  transpose_indices: [0,2,1]
+  logits_bbox_to_bbox_ls:
+    score_fn: null
+    bbox_index: [0,4]
+    scores_index: [4,-1]
   keypoint: false
   object6dpose: false
   name: detection_postprocess
