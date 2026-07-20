@@ -51,6 +51,10 @@ from onnx import shape_inference
 import argparse
 
 
+# Supported YOLO26 model variants
+YOLO26_VARIANTS = ['yolo26n', 'yolo26s', 'yolo26m', 'yolo26l', 'yolo26x']
+
+
 def parse_link_file(link_file_path):
     """
     Parse .link file to extract download URL and output filename.
@@ -228,7 +232,7 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=22
                 check_n=3,
                 perform_optimization=True,
                 skip_fuse_bn=False,
-                input_shapes={input_tensor.name: new_shape}
+                overwrite_input_shapes={input_tensor.name: new_shape}
             )
 
             if check:
@@ -294,64 +298,25 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=22
         return False
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Download ONNX model and fix shapes for hardware deployment',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Use default .link file and settings
-  %(prog)s
-
-  # Specify custom .link file
-  %(prog)s --link-file model.onnx.link
-
-  # Custom shape dimensions
-  %(prog)s --batch-size 4 --height 256 --width 256
-
-  # Force re-download
-  %(prog)s --force-download
-
-  # Skip model simplification (faster)
-  %(prog)s --no-simplifier
-
-  # Skip download (fix existing model only)
-  %(prog)s --skip-download
-
-  # Keep intermediate downloaded file
-  %(prog)s --keep-intermediate`
-        """
-    )
-
-    parser.add_argument('--link-file', type=str, default='yolo26n.onnx.link',
-                        help='Link file containing download URL (default: yolo26n.onnx.link)')
-    parser.add_argument('--batch-size', type=int, default=1,
-                        help='Fixed batch size (default: 1)')
-    parser.add_argument('--channels', type=int, default=3,
-                        help='Number of channels (default: 3)')
-    parser.add_argument('--height', type=int, default=640,
-                        help='Image height (default: 640)')
-    parser.add_argument('--width', type=int, default=640,
-                        help='Image width (default: 640)')
-    parser.add_argument('--force-download', action='store_true',
-                        help='Force re-download even if model exists')
-    parser.add_argument('--skip-download', action='store_true',
-                        help='Skip download, only fix existing model')
-    parser.add_argument('--no-simplifier', action='store_true',
-                        help='Skip onnx-simplifier optimization')
-    parser.add_argument('--keep-intermediate', action='store_true',
-                        help='Keep intermediate downloaded file (not cleaned up)')
-
-    args = parser.parse_args()
-
-    # Resolve paths
-    script_dir = Path(__file__).parent
-    link_file = script_dir / args.link_file
+def process_single_model(model_variant, script_dir, args):
+    """
+    Process a single model variant.
+    
+    Args:
+        model_variant: Name of the model variant (e.g., 'yolo26n')
+        script_dir: Directory containing the script and link files
+        args: Parsed command line arguments
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    link_file_name = f'{model_variant}.onnx.link'
+    link_file = script_dir / link_file_name
 
     if not link_file.exists():
         print(f"Error: Link file not found: {link_file}")
         print(f"Expected format in link file: <URL> -o <filename>")
-        sys.exit(1)
+        return False
 
     # Parse link file
     print("📄 Parsing Link File:")
@@ -361,7 +326,7 @@ Examples:
     download_url, model_filename = parse_link_file(link_file)
 
     if download_url is None or model_filename is None:
-        sys.exit(1)
+        return False
 
     print(f"Download URL: {download_url}")
     print(f"Model name (from .link file): {model_filename}")
@@ -380,22 +345,29 @@ Examples:
         if not final_output.exists():
             print(f"\n✗ Error: Model file not found: {final_output}")
             print(f"   Run without --skip-download to download it first.")
-            sys.exit(1)
+            return False
         model_path = final_output
         print(f"Using existing model: {model_path.name}")
+    elif final_output.exists() and not args.force_download:
+        # Final ONNX already present — skip download
+        file_size = final_output.stat().st_size
+        print(f"\n⏭  Skipping download :")
+        model_path = final_output
+        print(f"   {final_output.name} already exists "
+              f"({file_size:,} bytes / {file_size / 1024 / 1024:.2f} MB).")
+        print(f"   Use --force-download to re-download and re-convert.")
     else:
         # Download to temporary location
         model_path = temp_download
 
-    # Step 1: Download model (unless skipped)
-    if not args.skip_download:
+        # Step 1: Download model (unless skipped)
         success = download_model(download_url, model_path, force=args.force_download)
         if not success:
             print("\n✗ Download failed, aborting.")
             # Clean up temporary file if download failed
             if model_path.exists():
                 model_path.unlink()
-            sys.exit(1)
+            return False
 
     # Step 2: Fix shapes (output directly to final location)
     success = fix_model_shape(
@@ -427,13 +399,129 @@ Examples:
         print(f"Final model:    {final_output.name}")
         print(f"Location:       {script_dir}")
         print(f"Input shape:    [{args.batch_size}, {args.channels}, {args.height}, {args.width}]")
-        sys.exit(0)
+        return True
     else:
         print("\n✗ Shape fixing failed")
         # Clean up temporary file on failure
         if not args.skip_download and model_path.exists() and model_path != final_output:
             model_path.unlink()
-        sys.exit(1)
+        return False
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Download ONNX model and fix shapes for hardware deployment',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Supported model variants: yolo26n, yolo26s, yolo26m, yolo26l, yolo26x
+
+Examples:
+  # Use default .link file and settings
+  %(prog)s
+
+  # Specify a model variant by name (uses <variant>.onnx.link automatically)
+  %(prog)s --model yolo26s
+  %(prog)s --model yolo26m
+  %(prog)s --model yolo26l
+  %(prog)s --model yolo26x
+
+  # Specify multiple models to process
+  %(prog)s --models yolo26n yolo26s yolo26m
+  %(prog)s --models yolo26l yolo26x
+
+  # Specify custom .link file explicitly
+  %(prog)s --link-file yolo26s.onnx.link
+
+  # Custom shape dimensions
+  %(prog)s --batch-size 4 --height 640 --width 640
+
+  # Force re-download
+  %(prog)s --force-download
+
+  # Skip model simplification (faster)
+  %(prog)s --no-simplifier
+
+  # Skip download (fix existing model only)
+  %(prog)s --skip-download
+
+  # Keep intermediate downloaded file
+  %(prog)s --keep-intermediate
+        """
+    )
+
+    parser.add_argument('--model', type=str, default=None,
+                        choices=YOLO26_VARIANTS,
+                        help=f'YOLO26 model variant to prepare. One of: {", ".join(YOLO26_VARIANTS)}. '
+                             f'Sets --link-file to <model>.onnx.link automatically. '
+                             f'Ignored if --link-file is specified explicitly.')
+    parser.add_argument('--models', nargs='+', type=str, default=None,
+                        choices=YOLO26_VARIANTS,
+                        help='List of YOLO26 model variants to prepare. Each model uses <model>.onnx.link. '
+                             f'Ignores --model and --link-file.')
+    parser.add_argument('--link-file', type=str, default=None,
+                        help='Link file containing download URL '
+                             '(default: yolo26n.onnx.link, or <model>.onnx.link if --model is set)')
+    parser.add_argument('--batch-size', type=int, default=1,
+                        help='Fixed batch size (default: 1)')
+    parser.add_argument('--channels', type=int, default=3,
+                        help='Number of channels (default: 3)')
+    parser.add_argument('--height', type=int, default=640,
+                        help='Image height (default: 640)')
+    parser.add_argument('--width', type=int, default=640,
+                        help='Image width (default: 640)')
+    parser.add_argument('--force-download', action='store_true',
+                        help='Force re-download even if model exists')
+    parser.add_argument('--skip-download', action='store_true',
+                        help='Skip download, only fix existing model')
+    parser.add_argument('--no-simplifier', action='store_true',
+                        help='Skip onnx-simplifier optimization')
+    parser.add_argument('--keep-intermediate', action='store_true',
+                        help='Keep intermediate downloaded file (not cleaned up)')
+
+    args = parser.parse_args()
+
+    # Handle mutually exclusive arguments
+    if args.models and (args.model or args.link_file):
+        print("Warning: --models ignores --model and --link-file arguments")
+
+    # Resolve paths
+    script_dir = Path(__file__).parent
+
+    # Process models
+    if args.models:
+        # Process multiple models
+        print(f"🚀 Processing {len(args.models)} models: {', '.join(args.models)}")
+        print("=" * 80)
+        
+        success_count = 0
+        for model_variant in args.models:
+            print(f"\n🔄 Processing model: {model_variant}")
+            print("-" * 80)
+            if process_single_model(model_variant, script_dir, args):
+                success_count += 1
+            print(f"\n✅ Completed processing for {model_variant}")
+            print("=" * 80)
+        
+        print(f"\n🎯 SUMMARY: Successfully processed {success_count}/{len(args.models)} models")
+        if success_count == len(args.models):
+            sys.exit(0)
+        else:
+            sys.exit(1)
+    else:
+        # Process single model (existing behavior)
+        # Resolve link file: --link-file takes priority, then --model, then default yolo26n
+        if args.link_file is not None:
+            link_file_name = args.link_file
+        elif args.model is not None:
+            link_file_name = f'{args.model}.onnx.link'
+        else:
+            link_file_name = 'yolo26n.onnx.link'
+
+        # Process the single model using the same function
+        if process_single_model(link_file_name.replace('.onnx.link', ''), script_dir, args):
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 if __name__ == "__main__":

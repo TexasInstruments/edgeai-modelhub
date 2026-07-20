@@ -1,0 +1,1 @@
+https://huggingface.co/onnx-community/yolo26s-ONNX/blob/main/onnx/model.onnx -o yolo26s.onnx

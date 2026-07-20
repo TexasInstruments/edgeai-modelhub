@@ -38,9 +38,13 @@ This YOLO26 model is specifically optimized for **Texas Instruments MPU (Micropr
 ## Model Details
 
 ---
-|Dataset |Model Name |Model ID |Input Size |Params |GigaMACs |Top-1 Accuracy% |Available |Notes |
-|-|-|-|-|-|-|-|-|-|
-|COCO |yolo26n |`??`| |~ M | | |  | |
+|Dataset |Model Name |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes |
+|-       |-           |-          |-            |-         |-     |
+|COCO    |yolo26n    |`cl-mh6001` |640×640    |57.5         | ✅       |      |
+|COCO    |yolo26s    |`cl-mh6002` |640×640    |60.0         | ✅       |      |
+|COCO    |yolo26m    |`cl-mh6003` |640×640    |62.0         | ✅       |      |
+|COCO    |yolo26l    |`cl-mh6004` |640×640    |64.0         | ✅       |      |
+|COCO    |yolo26x    |`cl-mh6005` |640×640    |66.0         | ✅       |      |
 ---
 
 ## Setup & Installation
@@ -57,11 +61,23 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 ## Usage
 
 ### Model Download
-The model can be downloaded automatically using the provided scripts:
+The model can be downloaded automatically using the provided scripts.
+Each variant has a corresponding `.link` file and can be prepared with `prepare_model.py`:
 
 ```bash
-# Prepare the model with shape fixing
+# Prepare a specific variant using --model flag
+python prepare_model.py --model yolo26n
+python prepare_model.py --model yolo26s
+python prepare_model.py --model yolo26m
+python prepare_model.py --model yolo26l
+python prepare_model.py --model yolo26x
+
+# Or specify the .link file directly
 python prepare_model.py --link-file yolo26n.onnx.link
+python prepare_model.py --link-file yolo26s.onnx.link
+python prepare_model.py --link-file yolo26m.onnx.link
+python prepare_model.py --link-file yolo26l.onnx.link
+python prepare_model.py --link-file yolo26x.onnx.link
 ```
 
 The `.link` file contains the HuggingFace model URL and will automatically:
