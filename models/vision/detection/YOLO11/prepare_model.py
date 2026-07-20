@@ -33,16 +33,16 @@ Script to download YOLO11 PyTorch (.pt) model from HuggingFace and convert to ON
 for hardware deployment on TI edge devices.
 
 Reads .link files containing download URLs and automatically:
-1. Downloads the .pt model if not present
-2. Converts the .pt model to ONNX format using Ultralytics
-3. Fixes dynamic shapes to static shapes
-4. Validates the result
+ 1. Downloads the .pt model if not present
+ 2. Converts the .pt model to ONNX format using Ultralytics
+ 3. Fixes dynamic shapes to static shapes
+ 4. Validates the result
 
 Link file format:
-    <download_url> -o <output_filename>
+     <download_url> -o <output_filename>
 
 Example:
-    https://huggingface.co/Ultralytics/YOLO11/blob/main/yolo11n.pt -o yolo11n.pt
+     https://huggingface.co/Ultralytics/YOLO11/blob/main/yolo11n.pt -o yolo11n.pt
 """
 
 import onnx
@@ -352,6 +352,136 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=64
 YOLO11_VARIANTS = ['yolo11n', 'yolo11s', 'yolo11m', 'yolo11l', 'yolo11x']
 
 
+def process_single_model(model_variant, script_dir, args):
+    """
+    Process a single model variant.
+    
+    Args:
+        model_variant: Name of the model variant (e.g., 'yolo11n')
+        script_dir: Directory containing the script and link files
+        args: Parsed command line arguments
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    link_file_name = f'{model_variant}.onnx.link'
+    link_file = script_dir / link_file_name
+
+    if not link_file.exists():
+        print(f"Error: Link file not found: {link_file}")
+        print(f"Expected format in link file: <URL> -o <filename>")
+        return False
+
+    # Parse link file
+    print("📄 Parsing Link File:")
+    print("=" * 80)
+    print(f"Link file: {link_file}")
+
+    download_url, onnx_filename = parse_link_file(link_file)
+
+    if download_url is None or onnx_filename is None:
+        return False
+
+    print(f"Download URL: {download_url}")
+    print(f"ONNX model name (from .link file): {onnx_filename}")
+
+    # The final output uses the name from .link file
+    final_onnx_output = script_dir / onnx_filename
+
+    # Derive the .pt filename from the URL (last path segment, keeping .pt extension)
+    pt_filename = Path(download_url.split('?')[0]).name  # e.g. yolo11n.pt
+    if not pt_filename.endswith('.pt'):
+        pt_filename = Path(onnx_filename).stem + '.pt'
+    pt_path = script_dir / pt_filename
+
+    # Temporary ONNX file (before shape fixing)
+    temp_onnx_path = script_dir / f".tmp_{onnx_filename}"
+
+    print(f"PT download path:  {pt_path.name}")
+    print(f"Final ONNX output: {final_onnx_output.name}")
+    print(f"Intermediate ONNX: {temp_onnx_path.name}")
+
+    if args.skip_download:
+        # User wants to fix an existing ONNX model
+        if not final_onnx_output.exists():
+            print(f"\n✗ Error: ONNX model file not found: {final_onnx_output}")
+            print(f"   Run without --skip-download to download and convert it first.")
+            return False
+        print(f"Using existing ONNX model: {final_onnx_output.name}")
+        model_path_for_fixing = final_onnx_output
+    elif final_onnx_output.exists() and not args.force_download:
+        # Final ONNX already present — skip download and conversion entirely
+        file_size = final_onnx_output.stat().st_size
+        print(f"\n⏭  Skipping download and ONNX conversion:")
+        print(f"   {final_onnx_output.name} already exists "
+              f"({file_size:,} bytes / {file_size / 1024 / 1024:.2f} MB).")
+        print(f"   Use --force-download to re-download and re-convert.")
+        model_path_for_fixing = final_onnx_output
+    else:
+        # Step 1: Download .pt model (always kept)
+        success = download_model(download_url, pt_path, force=args.force_download)
+        if not success:
+            print("\n✗ Download failed, aborting.")
+            if pt_path.exists():
+                pt_path.unlink()
+            return False
+
+        # Step 2: Convert .pt → ONNX to temporary location
+        success = convert_pt_to_onnx(
+            pt_path,
+            temp_onnx_path,
+            height=args.height,
+            width=args.width,
+        )
+        if not success:
+            print("\n✗ ONNX conversion failed, aborting.")
+            # Clean up temporary files
+            if temp_onnx_path.exists():
+                temp_onnx_path.unlink()
+            return False
+
+        print(f"\n📦 PT model kept at: {pt_path.name}")
+        model_path_for_fixing = temp_onnx_path
+
+    # Step 3: Fix shapes on the ONNX model (output to final location)
+    success = fix_model_shape(
+        model_path_for_fixing,
+        final_onnx_output,
+        batch_size=args.batch_size,
+        channels=args.channels,
+        height=args.height,
+        width=args.width,
+        use_simplifier=not args.no_simplifier
+    )
+
+    if success:
+        # Step 4: Clean up intermediate file (unless --keep-intermediate)
+        if not args.skip_download and model_path_for_fixing != final_onnx_output:
+            if args.keep_intermediate:
+                print(f"\n📦 Keeping intermediate file: {model_path_for_fixing.name}")
+            else:
+                print(f"\n🗑️  Cleaning up intermediate file...")
+                try:
+                    model_path_for_fixing.unlink()
+                    print(f"✓ Removed: {model_path_for_fixing.name}")
+                except Exception as e:
+                    print(f"⚠ Could not remove intermediate file: {e}")
+
+        print("\n" + "=" * 80)
+        print("✅ COMPLETE!")
+        print("=" * 80)
+        print(f"Final model:    {final_onnx_output.name}")
+        print(f"Location:       {script_dir}")
+        print(f"Input shape:    [{args.batch_size}, {args.channels}, {args.height}, {args.width}]")
+        return True
+    else:
+        print("\n✗ Shape fixing failed")
+        # Clean up temporary file on failure
+        if not args.skip_download and model_path_for_fixing.exists() and model_path_for_fixing != final_onnx_output:
+            model_path_for_fixing.unlink()
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Download YOLO11 .pt model, convert to ONNX, and fix shapes for hardware deployment',
@@ -374,6 +504,10 @@ Examples:
   %(prog)s --model yolo11l
   %(prog)s --model yolo11x
 
+  # Specify multiple models to process
+  %(prog)s --models yolo11n yolo11s yolo11m
+  %(prog)s --models yolo11l yolo11x
+
   # Specify custom .link file explicitly
   %(prog)s --link-file yolo11n.onnx.link
 
@@ -388,6 +522,9 @@ Examples:
 
   # Skip download and conversion (fix existing ONNX model only)
   %(prog)s --skip-download
+
+  # Keep intermediate downloaded file (the temporary ONNX before shape fixing)
+  %(prog)s --keep-intermediate
         """
     )
 
@@ -396,6 +533,10 @@ Examples:
                         help=f'YOLO11 model variant to prepare. One of: {", ".join(YOLO11_VARIANTS)}. '
                              f'Sets --link-file to <model>.onnx.link automatically. '
                              f'Ignored if --link-file is specified explicitly.')
+    parser.add_argument('--models', nargs='+', type=str, default=None,
+                        choices=YOLO11_VARIANTS,
+                        help='List of YOLO11 model variants to prepare. Each model uses <model>.onnx.link. '
+                             f'Ignores --model and --link-file.')
     parser.add_argument('--link-file', type=str, default=None,
                         help='Link file containing download URL for the .pt model '
                              '(default: yolo11n.onnx.link, or <model>.onnx.link if --model is set)')
@@ -413,107 +554,54 @@ Examples:
                         help='Skip download and conversion; fix existing ONNX model only')
     parser.add_argument('--no-simplifier', action='store_true',
                         help='Skip onnx-simplifier optimization')
+    parser.add_argument('--keep-intermediate', action='store_true',
+                        help='Keep intermediate downloaded file (the temporary ONNX before shape fixing)')
+
     args = parser.parse_args()
 
-    # Resolve link file: --link-file takes priority, then --model, then default yolo11n
-    if args.link_file is not None:
-        link_file_name = args.link_file
-    elif args.model is not None:
-        link_file_name = f'{args.model}.onnx.link'
-    else:
-        link_file_name = 'yolo11n.onnx.link'
+    # Handle mutually exclusive arguments
+    if args.models and (args.model or args.link_file):
+        print("Warning: --models ignores --model and --link-file arguments")
 
     # Resolve paths
     script_dir = Path(__file__).parent
-    link_file = script_dir / link_file_name
 
-    if not link_file.exists():
-        print(f"Error: Link file not found: {link_file}")
-        print(f"Expected format in link file: <URL> -o <filename>")
-        sys.exit(1)
-
-    # Parse link file
-    print("📄 Parsing Link File:")
-    print("=" * 80)
-    print(f"Link file: {link_file}")
-
-    download_url, onnx_filename = parse_link_file(link_file)
-
-    if download_url is None or onnx_filename is None:
-        sys.exit(1)
-
-    print(f"Download URL: {download_url}")
-    print(f"ONNX model name (from .link file): {onnx_filename}")
-
-    final_onnx_output = script_dir / onnx_filename
-
-    # Derive the .pt filename from the URL (last path segment, keeping .pt extension)
-    pt_filename = Path(download_url.split('?')[0]).name  # e.g. yolo11n.pt
-    if not pt_filename.endswith('.pt'):
-        pt_filename = Path(onnx_filename).stem + '.pt'
-    pt_path = script_dir / pt_filename
-
-    print(f"PT download path:  {pt_path.name}")
-    print(f"Final ONNX output: {final_onnx_output.name}")
-
-    if args.skip_download:
-        # User wants to fix an existing ONNX model
-        if not final_onnx_output.exists():
-            print(f"\n✗ Error: ONNX model file not found: {final_onnx_output}")
-            print(f"   Run without --skip-download to download and convert it first.")
-            sys.exit(1)
-        print(f"Using existing ONNX model: {final_onnx_output.name}")
-    elif final_onnx_output.exists() and not args.force_download:
-        # Final ONNX already present — skip download and conversion entirely
-        file_size = final_onnx_output.stat().st_size
-        print(f"\n⏭  Skipping download and ONNX conversion:")
-        print(f"   {final_onnx_output.name} already exists "
-              f"({file_size:,} bytes / {file_size / 1024 / 1024:.2f} MB).")
-        print(f"   Use --force-download to re-download and re-convert.")
-    else:
-        # Step 1: Download .pt model (always kept)
-        success = download_model(download_url, pt_path, force=args.force_download)
-        if not success:
-            print("\n✗ Download failed, aborting.")
-            if pt_path.exists():
-                pt_path.unlink()
-            sys.exit(1)
-
-        # Step 2: Convert .pt → ONNX
-        success = convert_pt_to_onnx(
-            pt_path,
-            final_onnx_output,
-            height=args.height,
-            width=args.width,
-        )
-        if not success:
-            print("\n✗ ONNX conversion failed, aborting.")
-            sys.exit(1)
-
-        print(f"\n📦 PT model kept at: {pt_path.name}")
-
-    # Step 3: Fix shapes on the ONNX model
-    success = fix_model_shape(
-        final_onnx_output,
-        final_onnx_output,
-        batch_size=args.batch_size,
-        channels=args.channels,
-        height=args.height,
-        width=args.width,
-        use_simplifier=not args.no_simplifier
-    )
-
-    if success:
-        print("\n" + "=" * 80)
-        print("✅ COMPLETE!")
+    # Process models
+    if args.models:
+        # Process multiple models
+        print(f"🚀 Processing {len(args.models)} models: {', '.join(args.models)}")
         print("=" * 80)
-        print(f"Final model:    {final_onnx_output.name}")
-        print(f"Location:       {script_dir}")
-        print(f"Input shape:    [{args.batch_size}, {args.channels}, {args.height}, {args.width}]")
-        sys.exit(0)
+        
+        success_count = 0
+        for model_variant in args.models:
+            print(f"\n🔄 Processing model: {model_variant}")
+            print("-" * 80)
+            if process_single_model(model_variant, script_dir, args):
+                success_count += 1
+            print(f"\n✅ Completed processing for {model_variant}")
+            print("=" * 80)
+        
+        print(f"\n🎯 SUMMARY: Successfully processed {success_count}/{len(args.models)} models")
+        if success_count == len(args.models):
+            sys.exit(0)
+        else:
+            sys.exit(1)
     else:
-        print("\n✗ Shape fixing failed")
-        sys.exit(1)
+        # Process single model (existing behavior)
+        # Resolve link file: --link-file takes priority, then --model, then default yolo11n
+        if args.link_file is not None:
+            link_file_name = args.link_file
+        elif args.model is not None:
+            link_file_name = f'{args.model}.onnx.link'
+        else:
+            link_file_name = 'yolo11n.onnx.link'
+
+        # Process the single model using the same function
+        model_variant = link_file_name.replace('.onnx.link', '')
+        if process_single_model(model_variant, script_dir, args):
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
