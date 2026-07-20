@@ -37,14 +37,14 @@ This YOLO26 model is specifically optimized for **Texas Instruments MPU (Micropr
 
 ## Model Details
 
----
-|Dataset |Model Name |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes |
-|-       |-           |-          |-            |-         |-     |
-|COCO    |yolo26n    |`cl-mh6001` |640×640    |57.5         | ✅       |      |
-|COCO    |yolo26s    |`cl-mh6002` |640×640    |60.0         | ✅       |      |
-|COCO    |yolo26m    |`cl-mh6003` |640×640    |62.0         | ✅       |      |
-|COCO    |yolo26l    |`cl-mh6004` |640×640    |64.0         | ✅       |      |
-|COCO    |yolo26x    |`cl-mh6005` |640×640    |66.0         | ✅       |      |
+
+| Dataset | Model Name | Model ID   | Input Size | mAP[.5:.95]% | Available | Notes |
+|---------|------------|------------|------------|--------------|-----------|-------|
+| COCO    | yolo26n    | `cl-mh6001` | 640×640    | 57.5         | ✅        |       |
+| COCO    | yolo26s    | `cl-mh6002` | 640×640    | 60.0         | ✅        |       |
+| COCO    | yolo26m    | `cl-mh6003` | 640×640    | 62.0         | ✅        |       |
+| COCO    | yolo26l    | `cl-mh6004` | 640×640    | 64.0         | ✅        |       |
+| COCO    | yolo26x    | `cl-mh6005` | 640×640    | 66.0         | ✅        |       |
 ---
 
 ## Setup & Installation

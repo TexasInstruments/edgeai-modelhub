@@ -1,140 +1,236 @@
-# ResNet-50 for TI EdgeAI
+----
+-license: apache-2.0
+-tags:
+-- vision
+-- image-classification
+-datasets:
+-- imagenet-1k
+----
 
----
-license: apache-2.0
-tags:
-- vision
-- image-classification
-datasets:
-- imagenet-1k
----
+<div align="center">
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Framework](https://img.shields.io/badge/Framework-ONNX-orange.svg)](https://onnx.ai/)
-[![Task](https://img.shields.io/badge/Task-Image%20Classification-green.svg)](https://github.com/TexasInstruments/edgeai)
+# 🖼️ ResNet-50 for TI EdgeAI
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Model Details](#model-details)
-- [Setup and Installation](#setup-and-installation)
-- [Usage](#usage)
-- [Citation](#citation)
-- [Additional Resources](#additional-resources)
+### Deep Residual Network for Image Classification
 
-<a name="introduction"></a>
-## Introduction
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
+[![Framework](https://img.shields.io/badge/Framework-ONNX-orange?style=for-the-badge)](https://onnx.ai/)
+[![Task](https://img.shields.io/badge/Task-Classification-green?style=for-the-badge)](https://github.com/TexasInstruments/edgeai)
+[![Dataset](https://img.shields.io/badge/Dataset-ImageNet--1K-blueviolet?style=for-the-badge)](http://www.image-net.org/)
 
-🚀 **Ready-to-deploy image classification for TI edge devices**
-
-This ResNet-50 model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image classification with minimal setup.
-
-### Learn More About TI EdgeAI Platform
-
-- 📖 **[EdgeAI SDK Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md)** - Complete SDK guide, installation, and system setup
-- 🔧 **[EdgeAI MPU Overview](https://github.com/TexasInstruments/edgeai/tree/main/edgeai-mpu)** - Architecture details, performance benchmarks, and development resources
-- 🌐 **[TI EdgeAI Ecosystem](https://github.com/TexasInstruments/edgeai)** - Explore the full EdgeAI toolkit and model zoo
+</div>
 
 ---
 
-<a name="model-details"></a>
-## Model Details
+## 📋 Overview
+
+**ResNet-50** is a 50-layer deep convolutional neural network optimized for **Texas Instruments MPU devices**. This production-ready model delivers industry-leading accuracy on ImageNet classification while maintaining efficient computation suitable for edge deployment.
+
+✅ **25.6M Parameters** - Efficient architecture  
+✅ **76.15% Top-1 Accuracy** - ImageNet benchmark  
+✅ **4.1 GigaMACs** - Low computational cost  
+✅ **Hardware-Optimized** - TI J784S4 validated  
 
 ---
-|Dataset |Model Name |Model ID |Input Size |Params |GigaMACs |Top-1 Accuracy% |Available |Notes |
-|-|-|-|-|-|-|-|-|-|
-|ImageNet |ResNet-50 v1.5 |`cl-6110`|224x224 |~25.6 M |4.1 |76.15 |Y  | |
+
+## 📊 Model Specifications
+
+| Property | Value |
+|----------|-------|
+| **Model ID** | `cl-6110` |
+| **Architecture** | ResNet-50 v1.5 |
+| **Input Size** | 224×224 RGB |
+| **Parameters** | ~25.6M |
+| **Computation** | 4.1 GigaMACs |
+| **Top-1 Accuracy** | 76.15% |
+| **Framework** | ONNX |
+| **License** | Apache 2.0 |
+| **Training Dataset** | ImageNet-1K |
+
 ---
 
-<a name="setup-and-installation"></a>
-## Setup and Installation
+## 🚀 Quick Start
 
-### Requirements
+### 1️⃣ Prerequisites
+
 ```bash
-# Python dependencies
-pip install onnx>=1.22.0
-pip install onnxruntime>=1.23.2
+pip install onnx>=1.22.0 onnxruntime>=1.23.2
 ```
-#### For TI hardware deployment
-Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)**
 
-<a name="usage"></a>
-## Usage
-
-### Model Download
-The model can be downloaded automatically using the provided scripts:
+### 2️⃣ Download Model
 
 ```bash
 # Prepare the model with shape fixing
 python prepare_model.py --link-file resnet50.onnx.link
 ```
 
-The `.link` file contains the HuggingFace model URL and will automatically:
-1. Download the model if not present locally
-2. Fix dynamic shapes to static shapes for hardware deployment
-3. Validate the model structure
+The script automatically:
+- 📥 Downloads from HuggingFace
+- 🔧 Fixes dynamic shapes to static
+- ✅ Validates model structure
 
-### Using the model on TI device
+### 3️⃣ Compile for TI Hardware
 
-#### Option 1: Advanced Users (TIDL Tools)
-For users familiar with TIDL and requiring fine-grained control:
+**Using TIDL Runner (Recommended):**
 
 ```bash
-# Use edgeai-tidl-tools for compilation and inference
+tidlrunner-cli compile --target_device J784S4 \
+  --config_path resnet50_config.yaml
+```
+
+**Using TIDL Tools (Advanced):**
+
+```bash
 git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
 cd edgeai-tidl-tools
+# Follow setup at https://github.com/TexasInstruments/edgeai-tidl-tools
 ```
 
-Refer to the [tidl-tools setup](https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/README.md#getting-started) page for more details on compile and infer.
-
-**Learn more:** [edgeai-tidl-tools documentation](https://github.com/TexasInstruments/edgeai-tidl-tools)
-
-#### Option 2: Simplified Workflow (Recommended)
-For easy compilation, benchmarking, and accuracy evaluation:
-
-setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
+### 4️⃣ Evaluate Performance
 
 ```bash
-# compile the model and evaluate the performance on J784S4. Should execute form tidlrunner setup directory.
-# Compile model
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/classification/resnet/resnet50_config.yaml
-
-# Evaluate accuracy
-tidlrunner-cli evaluate --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/classification/resnet/resnet50_config.yaml
+tidlrunner-cli evaluate --target_device J784S4 \
+  --config_path resnet50_config.yaml
 ```
 
-**Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)
+---
 
-<a name="citation"></a>
-## Citation
+## 🛠️ Setup & Installation
 
-If you use this model in your research or applications, please cite:
+### Requirements
+
+```bash
+# Python dependencies
+pip install onnx>=1.22.0
+pip install onnxruntime>=1.23.2
+```
+
+### Hardware Deployment
+
+- **Primary Target:** TI J784S4 MPU
+- **Framework:** TIDL Compilation Tools
+- **Deployment:** [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)
+
+---
+
+## 📚 Deployment Options
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎯 Recommended: TIDL Runner
+High-level interface for easy deployment
+
+**Best for:**
+- Quick prototyping
+- Model evaluation
+- Benchmark testing
+
+[Setup Guide →](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
+
+</td>
+<td width="50%">
+
+### ⚙️ Advanced: TIDL Tools
+Low-level compilation framework
+
+**Best for:**
+- Custom optimization
+- Fine-grained control
+- Production deployment
+
+[Documentation →](https://github.com/TexasInstruments/edgeai-tidl-tools)
+
+</td>
+</tr>
+</table>
+
+---
+
+## 💡 Use Cases
+
+| Application | Details |
+|-------------|---------|
+| 🏭 **Industrial** | Product classification, defect detection |
+| 📹 **Surveillance** | Scene understanding, object categorization |
+| 🤖 **Robotics** | Visual perception, environment understanding |
+| 🌐 **IoT** | Edge inference, smart cameras |
+
+---
+
+## 📖 Citation
+
+If you use this model, please cite:
 
 ```bibtex
 @inproceedings{he2016deep,
   title={Deep residual learning for image recognition},
   author={He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
-  booktitle={Proceedings of the IEEE conference on computer vision and pattern recognition},
+  booktitle={Proceedings of the IEEE conference on computer vision 
+            and pattern recognition},
   pages={770--778},
   year={2016}
 }
 ```
 
-<a name="additional-resources"></a>
-## Additional Resources
+---
 
-### Tools & Frameworks
-- [EdgeAI TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools) - Low-level compilation and inference
-- [EdgeAI TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) - High-level wrapper for easy deployment
-- [EdgeAI Main Repository](https://github.com/TexasInstruments/edgeai) - Complete EdgeAI ecosystem
+## 🔗 Resources
 
-### Related Models
-- ResNet-18 (lighter variant, lower accuracy)
-- ResNet-101 (deeper variant, higher accuracy)
-- MobileNetV2 (mobile-optimized alternative)
-- EfficientNet (efficiency-optimized alternative)
+| Resource | Link |
+|----------|------|
+| 📖 **Paper** | [arXiv:1512.03385](https://arxiv.org/abs/1512.03385) |
+| 🔧 **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| 🚀 **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| 🌐 **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
+| 📦 **ONNX Format** | [onnx.ai](https://onnx.ai/) |
+
+---
+
+## 🔀 Related Models
+
+<table>
+<tr>
+<td align="center">
+
+**ResNet-18**  
+Lightweight variant  
+Lower accuracy
+
+</td>
+<td align="center">
+
+**ResNet-101**  
+Deeper variant  
+Higher accuracy
+
+</td>
+<td align="center">
+
+**MobileNetV2**  
+Mobile-optimized  
+Ultra-lightweight
+
+</td>
+<td align="center">
+
+**EfficientNet**  
+Efficiency-focused  
+Flexible scaling
+
+</td>
+</tr>
+</table>
+
+---
+
+<div align="center">
 
 **License:** Apache 2.0  
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** June 2026
+**Last Updated:** July 2026
+
+[🏠 Back to Model Hub](../../README.md)
+
+</div>
