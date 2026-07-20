@@ -348,22 +348,39 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=64
         return False
 
 
+# Supported YOLO11 model variants
+YOLO11_VARIANTS = ['yolo11n', 'yolo11s', 'yolo11m', 'yolo11l', 'yolo11x']
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Download YOLO11 .pt model, convert to ONNX, and fix shapes for hardware deployment',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+Supported model variants: yolo11n, yolo11s, yolo11m, yolo11l, yolo11x
+
+Notes:
+  If the final ONNX file already exists, download and conversion are skipped
+  automatically and the existing file is used directly. Pass --force-download
+  to override this behaviour and re-download / re-convert.
+
 Examples:
   # Use default .link file and settings (downloads .pt, converts to ONNX, keeps .pt)
   %(prog)s
 
-  # Specify custom .link file
+  # Specify a model variant by name (uses <variant>.onnx.link automatically)
+  %(prog)s --model yolo11s
+  %(prog)s --model yolo11m
+  %(prog)s --model yolo11l
+  %(prog)s --model yolo11x
+
+  # Specify custom .link file explicitly
   %(prog)s --link-file yolo11n.onnx.link
 
   # Custom shape dimensions
   %(prog)s --batch-size 4 --height 640 --width 640
 
-  # Force re-download of .pt model
+  # Force re-download and re-conversion even if ONNX already exists
   %(prog)s --force-download
 
   # Skip model simplification (faster)
@@ -374,8 +391,14 @@ Examples:
         """
     )
 
-    parser.add_argument('--link-file', type=str, default='yolo11n.onnx.link',
-                        help='Link file containing download URL for the .pt model (default: yolo11n.onnx.link)')
+    parser.add_argument('--model', type=str, default=None,
+                        choices=YOLO11_VARIANTS,
+                        help=f'YOLO11 model variant to prepare. One of: {", ".join(YOLO11_VARIANTS)}. '
+                             f'Sets --link-file to <model>.onnx.link automatically. '
+                             f'Ignored if --link-file is specified explicitly.')
+    parser.add_argument('--link-file', type=str, default=None,
+                        help='Link file containing download URL for the .pt model '
+                             '(default: yolo11n.onnx.link, or <model>.onnx.link if --model is set)')
     parser.add_argument('--batch-size', type=int, default=1,
                         help='Fixed batch size (default: 1)')
     parser.add_argument('--channels', type=int, default=3,
@@ -385,16 +408,24 @@ Examples:
     parser.add_argument('--width', type=int, default=640,
                         help='Image width (default: 640)')
     parser.add_argument('--force-download', action='store_true',
-                        help='Force re-download even if .pt model exists')
+                        help='Force re-download and re-conversion even if the final ONNX already exists')
     parser.add_argument('--skip-download', action='store_true',
                         help='Skip download and conversion; fix existing ONNX model only')
     parser.add_argument('--no-simplifier', action='store_true',
                         help='Skip onnx-simplifier optimization')
     args = parser.parse_args()
 
+    # Resolve link file: --link-file takes priority, then --model, then default yolo11n
+    if args.link_file is not None:
+        link_file_name = args.link_file
+    elif args.model is not None:
+        link_file_name = f'{args.model}.onnx.link'
+    else:
+        link_file_name = 'yolo11n.onnx.link'
+
     # Resolve paths
     script_dir = Path(__file__).parent
-    link_file = script_dir / args.link_file
+    link_file = script_dir / link_file_name
 
     if not link_file.exists():
         print(f"Error: Link file not found: {link_file}")
@@ -432,6 +463,13 @@ Examples:
             print(f"   Run without --skip-download to download and convert it first.")
             sys.exit(1)
         print(f"Using existing ONNX model: {final_onnx_output.name}")
+    elif final_onnx_output.exists() and not args.force_download:
+        # Final ONNX already present — skip download and conversion entirely
+        file_size = final_onnx_output.stat().st_size
+        print(f"\n⏭  Skipping download and ONNX conversion:")
+        print(f"   {final_onnx_output.name} already exists "
+              f"({file_size:,} bytes / {file_size / 1024 / 1024:.2f} MB).")
+        print(f"   Use --force-download to re-download and re-convert.")
     else:
         # Step 1: Download .pt model (always kept)
         success = download_model(download_url, pt_path, force=args.force_download)

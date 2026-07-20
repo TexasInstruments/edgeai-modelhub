@@ -38,9 +38,13 @@ This YOLO11 model is specifically optimized for **Texas Instruments MPU (Micropr
 ## Model Details
 
 ---
-|Dataset |Model Name |Model ID |Input Size |Params |GigaMACs |Top-1 Accuracy% |Available |Notes |
-|-|-|-|-|-|-|-|-|-|
-|COCO |yolo11n |`??`| |~ M | | |  | |
+|Dataset |Model Name |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes |
+|-       |-          |-           |-          |-            |-         |-     |
+|COCO    |yolo11n    |`od-mh8004` |640×640    |39.5         | ✅       |      |
+|COCO    |yolo11s    |`od-mh8005` |640×640    |47.0         | ✅       |      |
+|COCO    |yolo11m    |`od-mh8006` |640×640    |51.5         | ✅       |      |
+|COCO    |yolo11l    |`od-mh8007` |640×640    |53.4         | ✅       |      |
+|COCO    |yolo11x    |`od-mh8008` |640×640    |54.7         | ✅       |      |
 ---
 
 ## Setup & Installation
@@ -57,11 +61,24 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 ## Usage
 
 ### Model Download
-The model can be downloaded automatically using the provided scripts:
+The model can be downloaded automatically using the provided scripts.
+
+Each variant has a corresponding `.link` file and can be prepared with `prepare_model.py`:
 
 ```bash
-# Prepare the model with shape fixing
+# Prepare a specific variant using --model flag
+python prepare_model.py --model yolo11n
+python prepare_model.py --model yolo11s
+python prepare_model.py --model yolo11m
+python prepare_model.py --model yolo11l
+python prepare_model.py --model yolo11x
+
+# Or specify the .link file directly
 python prepare_model.py --link-file yolo11n.onnx.link
+python prepare_model.py --link-file yolo11s.onnx.link
+python prepare_model.py --link-file yolo11m.onnx.link
+python prepare_model.py --link-file yolo11l.onnx.link
+python prepare_model.py --link-file yolo11x.onnx.link
 ```
 
 The `.link` file contains the HuggingFace model URL and will automatically:
@@ -90,15 +107,31 @@ For easy compilation, benchmarking, and accuracy evaluation:
 setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
 
 ```bash
-# compile the model and evaluate the performance on J784S4. Should execute form tidlrunner setup directory.
-# Compile model
+# Compile model and evaluate performance on J784S4.
+# Should execute from tidlrunner setup directory.
+
+# yolo11n
 tidlrunner-cli compile --target_device J784S4 --config_path \
 <edgeai-modelhub-path>/vision/detection/YOLO11/yolo11n_model_config.yaml
 
-# Evaluate accuracy
-tidlrunner-cli evaluate --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11n_model_config.yaml
+# yolo11s
+tidlrunner-cli compile --target_device J784S4 --config_path \
+<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11s_model_config.yaml
+
+# yolo11m
+tidlrunner-cli compile --target_device J784S4 --config_path \
+<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11m_model_config.yaml
+
+# yolo11l
+tidlrunner-cli compile --target_device J784S4 --config_path \
+<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11l_model_config.yaml
+
+# yolo11x
+tidlrunner-cli compile --target_device J784S4 --config_path \
+<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11x_model_config.yaml
 ```
+
+To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
 
 **Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)
 
