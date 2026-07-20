@@ -1,0 +1,1 @@
+https://huggingface.co/Ultralytics/YOLO11/blob/main/yolo11m.pt -o yolo11m.onnx

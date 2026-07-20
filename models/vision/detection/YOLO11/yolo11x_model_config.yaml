@@ -31,8 +31,8 @@ session:
     # advanced_options:output_feature_16bit_names_list: ''
     # advanced_options:params_16bit_names_list: ''
     # object_detection:meta_arch_type: 6
-  model_path: yolov8n.onnx
-  model_id: od-mh8000
+  model_path: yolo11x.onnx
+  model_id: od-mh8008
   input_details: null
   output_details: null
   num_inputs: 1
@@ -141,6 +141,6 @@ metric:
     80: 91
 model_info:
   metric_reference:
-    accuracy_ap[.5:.95]%: 37.3
-  compact_name: yolov8n-coco-640x640
+    accuracy_ap[.5:.95]%: 54.7
+  compact_name: yolo11x-coco-640x640
   shortlisted: true

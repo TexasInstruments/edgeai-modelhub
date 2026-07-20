@@ -1,0 +1,70 @@
+task_type: detection
+dataloader:
+  name: coco_detection_dataloader
+  path: ./data/datasets/coco
+preprocess:
+  resize: 640
+  crop: 640
+  data_layout: NCHW
+  reverse_channels: false
+  backend: cv2
+  interpolation: null
+  resize_with_pad:
+  - true
+  - center
+  name: image_preprocess
+  pad_color:
+  - 114
+  - 114
+  - 114
+session:
+  session_name: onnxrt
+  target_device: null
+  input_optimization: false
+  input_data_layout: NCHW
+  input_mean:
+  - 0
+  - 0
+  - 0
+  input_scale:
+  - 0.003922
+  - 0.003922
+  - 0.003922
+  model_path: yolo26l.onnx
+  model_id: cl-mh6004
+  input_details: null
+  output_details: null
+  num_inputs: 1
+postprocess: 
+  # func: '''
+  #   def postprocess_func(tensors, info_dict):
+  #     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+  #     return tensors, info_dict
+  # '''
+  reshape_list: null
+  formatter: 
+      name: DetectionXYWH2XYXYCenterXY
+  resize_with_pad:
+  - true
+  - center
+  normalized_detections: false
+  shuffle_indices: null
+  squeeze_axis: null
+  ignore_index: null
+  model_output_type: combined
+  # transpose_indices: [0,2,1]
+  concat_details:
+    axis: 2
+    end_index: 2
+  logits_bbox_to_bbox_ls:
+    score_fn: null
+    bbox_index: [0,4]
+    scores_index: [4,-1]
+  keypoint: false
+  object6dpose: false
+  name: detection_postprocess
+model_info:
+  metric_reference:
+    accuracy_ap[.5:.95]%: 64.0
+  compact_name: yolo26l
+  shortlisted: true
