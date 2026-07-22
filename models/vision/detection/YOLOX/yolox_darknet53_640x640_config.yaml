@@ -29,7 +29,7 @@ session:
   - 0.003922
   - 0.003922
   runtime_options: {}
-  model_path: yolox_darknet53.onnx
+  model_path: yolox_darknet53_640x640.pth
   model_id: od-mh8014
   input_details: null
   output_details: null
