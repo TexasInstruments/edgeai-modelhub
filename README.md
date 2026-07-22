@@ -58,6 +58,7 @@ Models are compiled and deployed using:
 | **YOLO11** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 39.5-54.7% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO11/) |
 | **YOLO26** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 57.5-66.0% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO26/) |
 | **YOLOv8** | 🎯 Object Detection | n, m | 640×640 | COCO trained | AGPL 3.0 | [📖](models/vision/detection/YOLOv8/) |
+| **YOLOX** | 🎯 Object Detection | nano, tiny, m, l, x, darknet53 | 416×416/640×640 | 24.8-51.2% mAP | Apache 2.0 | [📖](models/vision/detection/YOLOX/) |
 
 ---
 

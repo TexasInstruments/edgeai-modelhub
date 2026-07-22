@@ -31,7 +31,7 @@ session:
   - 0.003922
   - 0.003922
   model_path: yolo26x.onnx
-  model_id: cl-mh6005
+  model_id: od-mh8019
   input_details: null
   output_details: null
   num_inputs: 1
