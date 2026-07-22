@@ -3,8 +3,8 @@ dataloader:
   name: coco_detection_dataloader
   path: ./data/datasets/coco
 preprocess:
-  resize: 640
-  crop: 640
+  resize: 416
+  crop: 416
   data_layout: NCHW
   reverse_channels: true
   backend: cv2
@@ -28,15 +28,19 @@ session:
   - 0.003922
   - 0.003922
   - 0.003922
-  runtime_options: {}
-  model_path: yolox_x_640x640.pth
-  model_id: od-mh8013
+  runtime_options:
+    # advanced_options:output_feature_16bit_names_list: 1033, 711, 712, 713, 727, 728,
+      # 729, 743, 744, 745
+    # object_detection:meta_arch_type: 6
+    # object_detection:meta_layers_names_list: yolox_nano_416x416_model.prototxt
+  model_path: yolox_nano.onnx
+  model_id: od-mh8009
   input_details: null
   output_details: null
   num_inputs: 1
 postprocess:
   reshape_list: null
-  formatter:
+  formatter: 
       name: DetectionXYWH2XYXYCenterXY
   resize_with_pad:
   - true
@@ -46,6 +50,7 @@ postprocess:
   squeeze_axis: null
   ignore_index: null
   model_output_type: combined
+  # transpose_indices: [0,2,1]
   logits_bbox_to_bbox_ls:
     score_fn: null
     bbox_index: [0,4]
@@ -138,8 +143,8 @@ metric:
     80: 91
 model_info:
   metric_reference:
-    accuracy_ap[.5:.95]%: 51.2
+    accuracy_ap[.5:.95]%: 24.8
   model_shortlist: 10
-  compact_name: yolox-x-640x640
+  compact_name: yolox-nano-416x416
   shortlisted: true
-  recommended: false
+  recommended: true

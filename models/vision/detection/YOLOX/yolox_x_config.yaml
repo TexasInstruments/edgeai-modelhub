@@ -3,8 +3,8 @@ dataloader:
   name: coco_detection_dataloader
   path: ./data/datasets/coco
 preprocess:
-  resize: 416
-  crop: 416
+  resize: 640
+  crop: 640
   data_layout: NCHW
   reverse_channels: true
   backend: cv2
@@ -29,8 +29,8 @@ session:
   - 0.003922
   - 0.003922
   runtime_options: {}
-  model_path: yolox_tiny_416x416.pth
-  model_id: od-mh8010
+  model_path: yolox_x.onnx
+  model_id: od-mh8013
   input_details: null
   output_details: null
   num_inputs: 1
@@ -138,8 +138,8 @@ metric:
     80: 91
 model_info:
   metric_reference:
-    accuracy_ap[.5:.95]%: 32.8
+    accuracy_ap[.5:.95]%: 51.2
   model_shortlist: 10
-  compact_name: yolox-tiny-416x416
+  compact_name: yolox-x-640x640
   shortlisted: true
   recommended: false

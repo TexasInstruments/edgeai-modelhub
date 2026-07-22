@@ -29,8 +29,8 @@ session:
   - 0.003922
   - 0.003922
   runtime_options: {}
-  model_path: yolox_m_640x640.pth
-  model_id: od-mh8011
+  model_path: yolox_l.onnx
+  model_id: od-mh8012
   input_details: null
   output_details: null
   num_inputs: 1
@@ -138,8 +138,8 @@ metric:
     80: 91
 model_info:
   metric_reference:
-    accuracy_ap[.5:.95]%: 46.9
+    accuracy_ap[.5:.95]%: 49.7
   model_shortlist: 10
-  compact_name: yolox-m-640x640
+  compact_name: yolox-l-640x640
   shortlisted: true
   recommended: false
