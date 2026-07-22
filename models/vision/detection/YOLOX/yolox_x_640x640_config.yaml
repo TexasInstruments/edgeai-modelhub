@@ -30,7 +30,7 @@ session:
   - 0.003922
   runtime_options: {}
   model_path: yolox_x.onnx
-  model_id: od-mh8007
+  model_id: od-mh8013
   input_details: null
   output_details: null
   num_inputs: 1

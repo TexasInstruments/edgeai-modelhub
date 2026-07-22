@@ -42,12 +42,12 @@ YOLOX is an anchor-free version of YOLO with decoupled head design, providing st
 ---
 |Dataset |Model Name      |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes                  |
 |-       |-               |-           |-          |-            |-         |-                      |
-|COCO    |yolox-nano      |`od-mh8003` |416×416    |24.8         | ✅       |Recommended, Smallest  |
-|COCO    |yolox-tiny      |`od-mh8004` |416×416    |32.8         | ✅       |                       |
-|COCO    |yolox-m         |`od-mh8005` |640×640    |46.9         | ✅       |                       |
-|COCO    |yolox-l         |`od-mh8006` |640×640    |49.7         | ✅       |                       |
-|COCO    |yolox-x         |`od-mh8007` |640×640    |51.2         | ✅       |Largest                |
-|COCO    |yolox-darknet53 |`od-mh8008` |640×640    |47.4         | ✅       |Darknet53 backbone     |
+|COCO    |yolox-nano      |`od-mh8009` |416×416    |24.8         | ✅       |Recommended, Smallest  |
+|COCO    |yolox-tiny      |`od-mh8010` |416×416    |32.8         | ✅       |                       |
+|COCO    |yolox-m         |`od-mh8011` |640×640    |46.9         | ✅       |                       |
+|COCO    |yolox-l         |`od-mh8012` |640×640    |49.7         | ✅       |                       |
+|COCO    |yolox-x         |`od-mh8013` |640×640    |51.2         | ✅       |Largest                |
+|COCO    |yolox-darknet53 |`od-mh8014` |640×640    |47.4         | ✅       |Darknet53 backbone     |
 ---
 
 ## Setup & Installation

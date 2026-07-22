@@ -35,7 +35,7 @@ session:
     # object_detection:meta_layers_names_list: yolox_nano_416x416_model.prototxt
   model_path: yolox_nano.onnx
   # model_path: yolox_s.onnx
-  model_id: od-mh8003
+  model_id: od-mh8009
   input_details: null
   output_details: null
   num_inputs: 1
