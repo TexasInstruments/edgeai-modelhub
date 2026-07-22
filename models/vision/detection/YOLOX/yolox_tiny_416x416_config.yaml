@@ -29,7 +29,7 @@ session:
   - 0.003922
   - 0.003922
   runtime_options: {}
-  model_path: yolox_tiny.onnx
+  model_path: yolox_tiny_416x416.pth
   model_id: od-mh8010
   input_details: null
   output_details: null
