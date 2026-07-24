@@ -88,7 +88,7 @@ python prepare_model.py --model yolo11n
 ```bash
 # Use TIDL Runner (recommended)
 tidlrunner-cli compile --target_device J784S4 \
-  --config_path <path-to>/yolo11n_model_config.yaml
+  --config_path yolo11n_model_config.yaml
 ```
 
 ---

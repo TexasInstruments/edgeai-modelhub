@@ -60,6 +60,13 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 
 ## Usage
 
+### Download from HuggingFace
+If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+
+```bash
+hf download <REPO_ID> --local-dir <download_location>
+```
+
 ### Model Download
 The model can be downloaded automatically using the provided scripts.
 Each variant has a corresponding `.link` file and can be prepared with `prepare_model.py`:
@@ -106,14 +113,13 @@ For easy compilation, benchmarking, and accuracy evaluation:
 setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
 
 ```bash
-# compile the model and evaluate the performance on J784S4. Should execute form tidlrunner setup directory.
+# Compile model and evaluate performance on J784S4.
+
 # Compile model
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO26/yolo26n_model_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolo26n_model_config.yaml
 
 # Evaluate accuracy
-tidlrunner-cli evaluate --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO26/yolo26n_model_config.yaml
+tidlrunner-cli evaluate --target_device J784S4 --config_path yolo26n_model_config.yaml
 ```
 
 **Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)

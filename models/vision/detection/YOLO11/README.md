@@ -60,6 +60,13 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 
 ## Usage
 
+### Download from HuggingFace
+If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+
+```bash
+hf download <REPO_ID> --local-dir <download_location>
+```
+
 ### Model Download
 The model can be downloaded automatically using the provided scripts.
 
@@ -108,27 +115,21 @@ setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/T
 
 ```bash
 # Compile model and evaluate performance on J784S4.
-# Should execute from tidlrunner setup directory.
 
 # yolo11n
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11n_model_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolo11n_model_config.yaml
 
 # yolo11s
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11s_model_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolo11s_model_config.yaml
 
 # yolo11m
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11m_model_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolo11m_model_config.yaml
 
 # yolo11l
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11l_model_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolo11l_model_config.yaml
 
 # yolo11x
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLO11/yolo11x_model_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolo11x_model_config.yaml
 ```
 
 To evaluate accuracy, replace `compile` with `evaluate` in the commands above.

@@ -64,6 +64,13 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 
 ## Usage
 
+### Download from HuggingFace
+If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+
+```bash
+hf download <REPO_ID> --local-dir <download_location>
+```
+
 ### Model Download
 The models can be downloaded and prepared using the provided script.
 
@@ -116,31 +123,24 @@ setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/T
 
 ```bash
 # Compile model and evaluate performance on J784S4.
-# Should execute from tidlrunner setup directory.
 
 # yolox-nano (416×416)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_nano_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolox_nano_config.yaml
 
 # yolox-tiny (416×416)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_tiny_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolox_tiny_config.yaml
 
 # yolox-m (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_m_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolox_m_config.yaml
 
 # yolox-l (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_l_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolox_l_config.yaml
 
 # yolox-x (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_x_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolox_x_config.yaml
 
 # yolox-darknet53 (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_darknet53_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path yolox_darknet53_config.yaml
 ```
 
 To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
