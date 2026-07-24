@@ -63,6 +63,13 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 
 ## Usage
 
+### Download from HuggingFace
+If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+
+```bash
+hf download <REPO_ID> --local-dir <download_location>
+```
+
 ### Model Download
 The models can be downloaded and converted to ONNX using the provided script.
 
@@ -116,27 +123,21 @@ setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/T
 
 ```bash
 # Compile model and evaluate performance on J784S4.
-# Should execute from tidlrunner setup directory.
 
 # rtmdet-tiny (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_tiny_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_tiny_config.yaml
 
 # rtmdet-s (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_s_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_s_config.yaml
 
 # rtmdet-m (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_m_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_m_config.yaml
 
 # rtmdet-l (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_l_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_l_config.yaml
 
 # rtmdet-x (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_x_config.yaml
+tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_x_config.yaml
 ```
 
 To evaluate accuracy, replace `compile` with `evaluate` in the commands above.

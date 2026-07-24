@@ -7,7 +7,7 @@ datasets:
 - COCO
 ---
 
-# YOLO11 for TI EdgeAI
+# YOLOv8 for TI EdgeAI
 
 [![License](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Framework](https://img.shields.io/badge/Framework-ONNX-orange.svg)](https://onnx.ai/)
@@ -25,7 +25,9 @@ datasets:
 
 🚀 **Ready-to-deploy image detection for TI edge devices**
 
-This YOLO11 model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
+This YOLOv8 model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
+
+YOLOv8 is Ultralytics' state-of-the-art real-time object detector featuring an anchor-free split head design for improved accuracy and speed. It supports five size variants (n, s, m, l, x) offering a wide accuracy-speed trade-off, making it suitable for both resource-constrained edge devices and high-throughput deployments.
 
 ### Learn More About TI EdgeAI Platform
 
@@ -38,13 +40,13 @@ This YOLO11 model is specifically optimized for **Texas Instruments MPU (Micropr
 ## Model Details
 
 ---
-|Dataset |Model Name |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes |
-|-       |-          |-           |-          |-            |-         |-     |
-|COCO    |yolo11n    |`od-mh8004` |640×640    |39.5         | ✅       |      |
-|COCO    |yolo11s    |`od-mh8005` |640×640    |47.0         | ✅       |      |
-|COCO    |yolo11m    |`od-mh8006` |640×640    |51.5         | ✅       |      |
-|COCO    |yolo11l    |`od-mh8007` |640×640    |53.4         | ✅       |      |
-|COCO    |yolo11x    |`od-mh8008` |640×640    |54.7         | ✅       |      |
+| Dataset | Model Name | Model ID    | Input Size | mAP[.5:.95]% | Available | Notes                 |
+| -       | -          | -           | -          | -            | -         | -                     |
+| COCO    | yolov8n    | `od-mh8000` | 640×640    | 37.3         | ✅        | Recommended, Smallest |
+| COCO    | yolov8s    | -           | 640×640    | 44.9         | -         |                       |
+| COCO    | yolov8m    | `od-mh8001` | 640×640    | 50.2         | ✅        |                       |
+| COCO    | yolov8l    | -           | 640×640    | 52.9         | -         |                       |
+| COCO    | yolov8x    | -           | 640×640    | 53.9         | -         | Largest               |
 ---
 
 ## Setup & Installation
@@ -54,6 +56,7 @@ This YOLO11 model is specifically optimized for **Texas Instruments MPU (Micropr
 # Python dependencies
 pip install onnx>=1.22.0
 pip install onnxruntime>=1.23.2
+pip install ultralytics
 ```
 #### For TI hardware deployment
 Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)**
@@ -67,31 +70,27 @@ If you are accessing this from HuggingFace, clone the repository using the `hf` 
 hf download <REPO_ID> --local-dir <download_location>
 ```
 
-### Model Download
-The model can be downloaded automatically using the provided scripts.
-
-Each variant has a corresponding `.link` file and can be prepared with `prepare_model.py`:
+### Model Export
+Models are exported from Ultralytics PyTorch checkpoints to ONNX using the provided script.
 
 ```bash
-# Prepare a specific variant using --model flag
-python prepare_model.py --model yolo11n
-python prepare_model.py --model yolo11s
-python prepare_model.py --model yolo11m
-python prepare_model.py --model yolo11l
-python prepare_model.py --model yolo11x
+# Export nano variant (default)
+python ultralytics_yolo8_export.py
 
-# Or specify the .link file directly
-python prepare_model.py --link-file yolo11n.onnx.link
-python prepare_model.py --link-file yolo11s.onnx.link
-python prepare_model.py --link-file yolo11m.onnx.link
-python prepare_model.py --link-file yolo11l.onnx.link
-python prepare_model.py --link-file yolo11x.onnx.link
+# Export specific variants
+python ultralytics_yolo8_export.py --models yolov8n yolov8m
+
+# Export all variants
+python ultralytics_yolo8_export.py --models yolov8n yolov8s yolov8m yolov8l yolov8x
+
+# Export with custom output directory
+python ultralytics_yolo8_export.py --models yolov8n --output-dir ./exports
 ```
 
-The `.link` file contains the HuggingFace model URL and will automatically:
-1. Download the model if not present locally
-2. Fix dynamic shapes to static shapes for hardware deployment
-3. Validate the model structure
+The script will automatically:
+1. Install required dependencies (`onnx`, `ultralytics`)
+2. Download the PyTorch checkpoint from Ultralytics
+3. Export to ONNX format with static input shapes (opset 19)
 
 ### Using the model on TI device
 
@@ -116,20 +115,11 @@ setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/T
 ```bash
 # Compile model and evaluate performance on J784S4.
 
-# yolo11n
-tidlrunner-cli compile --target_device J784S4 --config_path yolo11n_model_config.yaml
+# yolov8n
+tidlrunner-cli compile --target_device J784S4 --config_path yolov8n_config.yaml
 
-# yolo11s
-tidlrunner-cli compile --target_device J784S4 --config_path yolo11s_model_config.yaml
-
-# yolo11m
-tidlrunner-cli compile --target_device J784S4 --config_path yolo11m_model_config.yaml
-
-# yolo11l
-tidlrunner-cli compile --target_device J784S4 --config_path yolo11l_model_config.yaml
-
-# yolo11x
-tidlrunner-cli compile --target_device J784S4 --config_path yolo11x_model_config.yaml
+# yolov8m
+tidlrunner-cli compile --target_device J784S4 --config_path yolov8m_config.yaml
 ```
 
 To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
@@ -143,6 +133,10 @@ To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
 - [EdgeAI TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) - High-level wrapper for easy deployment
 - [EdgeAI Main Repository](https://github.com/TexasInstruments/edgeai) - Complete EdgeAI ecosystem
 
-**License:** agpl-3.0
+### YOLOv8 Resources
+- [Ultralytics YOLOv8 Repository](https://github.com/ultralytics/ultralytics) - Official implementation
+- [YOLOv8 Documentation](https://docs.ultralytics.com/models/yolov8/) - Architecture details and usage guide
+
+**License:** agpl-3.0  
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** June 2026
+**Last Updated:** July 2026

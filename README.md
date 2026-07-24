@@ -55,6 +55,7 @@ Models are compiled and deployed using:
 | Model | Capabilities | Variants | Input | Performance | License | Docs |
 |-------|--------------|----------|-------|-------------|---------|------|
 | **ResNet-50** | 🖼️ Image Classification | v1.5 | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
+| **RTMDet** | 🎯 Object Detection | tiny, s, m, l, x | 640×640 | 40.9-52.8% mAP | Apache 2.0 | [📖](models/vision/detection/RTMDet/) |
 | **YOLO11** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 39.5-54.7% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO11/) |
 | **YOLO26** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 57.5-66.0% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO26/) |
 | **YOLOv8** | 🎯 Object Detection | n, m | 640×640 | COCO trained | AGPL 3.0 | [📖](models/vision/detection/YOLOv8/) |
@@ -88,7 +89,7 @@ python prepare_model.py --model yolo11n
 ```bash
 # Use TIDL Runner (recommended)
 tidlrunner-cli compile --target_device J784S4 \
-  --config_path <path-to>/yolo11n_model_config.yaml
+  --config_path yolo11n_model_config.yaml
 ```
 
 ---
@@ -100,8 +101,11 @@ Detailed setup, usage, and deployment guides for each model:
 | Model | Documentation |
 |-------|---------------|
 | 🖼️ ResNet-50 Classification | [Read](models/vision/classification/resnet/README.md) |
+| 🎯 RTMDet Detection | [Read](models/vision/detection/RTMDet/README.md) |
 | 🎯 YOLO11 Detection | [Read](models/vision/detection/YOLO11/README.md) |
 | 🎯 YOLO26 Detection | [Read](models/vision/detection/YOLO26/README.md) |
+| 🎯 YOLOv8 Detection | [Read](models/vision/detection/YOLOv8/README.md) |
+| 🎯 YOLOX Detection | [Read](models/vision/detection/YOLOX/README.md) |
 
 ---
 
@@ -144,8 +148,8 @@ Main repository & documentation
 
 ## 📜 License
 
-- 📄 **ResNet-50**: Apache 2.0
-- 📄 **YOLO variants**: AGPL 3.0
+- 📄 **ResNet-50, RTMDet, YOLOX**: Apache 2.0
+- 📄 **YOLO11, YOLO26, YOLOv8**: AGPL 3.0
 
 ---
 

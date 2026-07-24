@@ -1,11 +1,11 @@
-----
--license: apache-2.0
--tags:
--- vision
--- image-classification
--datasets:
--- imagenet-1k
-----
+---
+license: apache-2.0
+tags:
+- vision
+- image-classification
+datasets:
+- imagenet-1k
+---
 
 <div align="center">
 
@@ -50,6 +50,13 @@
 ---
 
 ## 🚀 Quick Start
+
+### Download from HuggingFace
+If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+
+```bash
+hf download <REPO_ID> --local-dir <download_location>
+```
 
 ### 1️⃣ Prerequisites
 
