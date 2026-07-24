@@ -7,7 +7,7 @@ datasets:
 - COCO
 ---
 
-# YOLOX for TI EdgeAI
+# RTMDet for TI EdgeAI
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Framework](https://img.shields.io/badge/Framework-ONNX-orange.svg)](https://onnx.ai/)
@@ -25,9 +25,9 @@ datasets:
 
 🚀 **Ready-to-deploy image detection for TI edge devices**
 
-This YOLOX model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
+This RTMDet model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
 
-YOLOX is an anchor-free version of YOLO with decoupled head design, providing strong performance with simpler architecture. It offers excellent accuracy-speed trade-offs across different model sizes.
+RTMDet is a high-performance real-time object detector from OpenMMLab with a CSPNeXt backbone and an efficient anchor-free detection head. It achieves excellent accuracy-speed trade-offs across five model sizes (tiny, s, m, l, x), making it suitable for a wide range of deployment scenarios from resource-constrained edge devices to high-throughput server deployments.
 
 ### Learn More About TI EdgeAI Platform
 
@@ -40,14 +40,13 @@ YOLOX is an anchor-free version of YOLO with decoupled head design, providing st
 ## Model Details
 
 ---
-|Dataset |Model Name      |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes                  |
-|-       |-               |-           |-          |-            |-         |-                      |
-|COCO    |yolox-nano      |`od-mh8009` |416×416    |24.8         | ✅       |Recommended, Smallest  |
-|COCO    |yolox-tiny      |`od-mh8010` |416×416    |32.8         | ✅       |                       |
-|COCO    |yolox-m         |`od-mh8011` |640×640    |46.9         | ✅       |                       |
-|COCO    |yolox-l         |`od-mh8012` |640×640    |49.7         | ✅       |                       |
-|COCO    |yolox-x         |`od-mh8013` |640×640    |51.2         | ✅       |Largest                |
-|COCO    |yolox-darknet53 |`od-mh8014` |640×640    |47.4         | ✅       |Darknet53 backbone     |
+| Dataset | Model Name   | Model ID     | Input Size | mAP[.5:.95]% | Available | Notes              |
+| -       | -            | -            | -          | -            | -         | -                  |
+| COCO    | rtmdet-tiny  | `od-mh8020`  | 640×640    | 40.9         | ✅        | Recommended, Smallest |
+| COCO    | rtmdet-s     | `od-mh8021`  | 640×640    | 44.5         | ✅        |                    |
+| COCO    | rtmdet-m     | `od-mh8022`  | 640×640    | 49.3         | ✅        |                    |
+| COCO    | rtmdet-l     | `od-mh8023`  | 640×640    | 51.4         | ✅        |                    |
+| COCO    | rtmdet-x     | `od-mh8024`  | 640×640    | 52.8         | ✅        | Largest            |
 ---
 
 ## Setup & Installation
@@ -65,34 +64,35 @@ Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tid
 ## Usage
 
 ### Model Download
-The models can be downloaded and prepared using the provided script.
+The models can be downloaded and converted to ONNX using the provided script.
 
-Each variant has corresponding `.link` files and can be downloaded with `download_yolox.py`:
+Each variant has a corresponding `.link` file and can be downloaded with `download_and_convert_rtmdet.py`:
 
 ```bash
 # Download specific variants
-python download_yolox.py --model yolox_nano
-python download_yolox.py --model yolox_tiny
-python download_yolox.py --model yolox_m
-python download_yolox.py --model yolox_l
-python download_yolox.py --model yolox_x
-python download_yolox.py --model yolox_darknet53
+python download_and_convert_rtmdet.py --models tiny
+python download_and_convert_rtmdet.py --models s
+python download_and_convert_rtmdet.py --models m
+python download_and_convert_rtmdet.py --models l
+python download_and_convert_rtmdet.py --models x
 
 # Download multiple variants at once
-python download_yolox.py --model yolox_nano yolox_tiny yolox_m
+python download_and_convert_rtmdet.py --models tiny s m
+
+# Download all variants
+python download_and_convert_rtmdet.py
 
 # Download with ONNX simplification (recommended)
-python download_yolox.py --model yolox_nano --simplify
-
-# Download and verify accuracy on COCO val2017
-python download_yolox.py --model yolox_nano --verify --num-val-images 500
+python download_and_convert_rtmdet.py --models tiny --simplify
 ```
 
 The script will automatically:
-1. Download pre-built ONNX from GitHub releases (or convert from PyTorch if needed)
-2. Fix batch dimensions to static shapes for hardware deployment
-3. Optionally simplify the model using onnx-simplifier
-4. Optionally verify accuracy on COCO val2017 dataset
+1. Install all required dependencies
+2. Download the PyTorch checkpoint from OpenMMLab
+3. Download the model configuration files
+4. Convert to ONNX format
+5. Fix batch dimensions to static shapes for hardware deployment
+6. Optionally simplify the model using onnx-simplifier
 
 ### Using the model on TI device
 
@@ -118,29 +118,25 @@ setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/T
 # Compile model and evaluate performance on J784S4.
 # Should execute from tidlrunner setup directory.
 
-# yolox-nano (416×416)
+# rtmdet-tiny (640×640)
 tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_nano_config.yaml
+<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_tiny_config.yaml
 
-# yolox-tiny (416×416)
+# rtmdet-s (640×640)
 tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_tiny_config.yaml
+<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_s_config.yaml
 
-# yolox-m (640×640)
+# rtmdet-m (640×640)
 tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_m_config.yaml
+<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_m_config.yaml
 
-# yolox-l (640×640)
+# rtmdet-l (640×640)
 tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_l_config.yaml
+<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_l_config.yaml
 
-# yolox-x (640×640)
+# rtmdet-x (640×640)
 tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_x_config.yaml
-
-# yolox-darknet53 (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path \
-<edgeai-modelhub-path>/vision/detection/YOLOX/yolox_darknet53_config.yaml
+<edgeai-modelhub-path>/vision/detection/RTMDet/rtmdet_x_config.yaml
 ```
 
 To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
@@ -149,14 +145,14 @@ To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
 
 ## Citation
 
-If you use YOLOX in your research, please cite:
+If you use RTMDet in your research, please cite:
 
 ```bibtex
-@article{yolox2021,
-  title={YOLOX: Exceeding YOLO Series in 2021},
-  author={Ge, Zheng and Liu, Songtao and Wang, Feng and Li, Zeming and Sun, Jian},
-  journal={arXiv preprint arXiv:2107.08430},
-  year={2021}
+@article{lyu2022rtmdet,
+  title={RTMDet: An Empirical Study of Designing Real-Time Object Detectors},
+  author={Lyu, Chengqi and Zhang, Wenwei and Huang, Haian and Zhou, Yue and Wang, Yudong and Liu, Yanyi and Zhang, Shilong and Chen, Kai},
+  journal={arXiv preprint arXiv:2212.07784},
+  year={2022}
 }
 ```
 
@@ -167,9 +163,9 @@ If you use YOLOX in your research, please cite:
 - [EdgeAI TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) - High-level wrapper for easy deployment
 - [EdgeAI Main Repository](https://github.com/TexasInstruments/edgeai) - Complete EdgeAI ecosystem
 
-### YOLOX Resources
-- [YOLOX Official Repository](https://github.com/Megvii-BaseDetection/YOLOX) - Original implementation by Megvii
-- [YOLOX Paper](https://arxiv.org/abs/2107.08430) - arXiv paper with architecture details
+### RTMDet Resources
+- [RTMDet Official Repository](https://github.com/open-mmlab/mmdetection/tree/main/configs/rtmdet) - OpenMMLab implementation
+- [RTMDet Paper](https://arxiv.org/abs/2212.07784) - arXiv paper with architecture details
 
 **License:** apache-2.0  
 **Maintained by:** Texas Instruments EdgeAI Team  
