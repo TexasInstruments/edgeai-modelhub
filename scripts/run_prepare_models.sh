@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 # Copyright (c) 2018-2026, Texas Instruments
 # All Rights Reserved.
@@ -73,8 +73,6 @@ run_prepare_model() {
     local env_name=""
     local model_name=""
 
-    echo "==> $model_dir"
-
     (
         model_name="$(basename "$model_dir" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')"
         env_name="edgeai_${model_name}_$RANDOM"
@@ -104,21 +102,39 @@ main() {
 
     ensure_pyenv_python
 
+    local ok=0 fail=0 skip=0
+    local i=1 total=${#model_dirs[@]}
+
     for model_dir in "${model_dirs[@]}"; do
+        echo "[$i/$total] $model_dir"
+
         if [[ ! -d "$model_dir" ]]; then
-            echo "Skipping missing directory: $model_dir" >&2
+            echo "  [SKIP]"
+            ((skip++))
             continue
         fi
 
         if [[ ! -f "$model_dir/prepare_model.py" ]]; then
-            echo "Skipping (missing prepare_model.py): $model_dir" >&2
+            echo "  [SKIP]"
+            ((skip++))
             continue
         fi
 
         model_dir="$(cd "$model_dir" && pwd)"
-        run_prepare_model "$model_dir"
+
+        if run_prepare_model "$model_dir"; then
+            echo "  [OK]"
+            ((ok++))
+        else
+            echo "  [FAIL]"
+            ((fail++))
+        fi
         echo
+
+        ((i++))
     done
+
+    echo "Done: $ok OK, $fail FAIL, $skip SKIP"
 }
 
 main "$@"
