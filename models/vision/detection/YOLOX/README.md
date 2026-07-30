@@ -74,25 +74,25 @@ hf download <REPO_ID> --local-dir <download_location>
 ### Model Download
 The models can be downloaded and prepared using the provided script.
 
-Each variant has corresponding `.link` files and can be downloaded with `download_yolox.py`:
+Each variant has corresponding `.link` files and can be downloaded with `prepare_model.py`:
 
 ```bash
 # Download specific variants
-python download_yolox.py --model yolox_nano
-python download_yolox.py --model yolox_tiny
-python download_yolox.py --model yolox_m
-python download_yolox.py --model yolox_l
-python download_yolox.py --model yolox_x
-python download_yolox.py --model yolox_darknet53
+python prepare_model.py --model yolox_nano
+python prepare_model.py --model yolox_tiny
+python prepare_model.py --model yolox_m
+python prepare_model.py --model yolox_l
+python prepare_model.py --model yolox_x
+python prepare_model.py --model yolox_darknet53
 
 # Download multiple variants at once
-python download_yolox.py --model yolox_nano yolox_tiny yolox_m
+python prepare_model.py --model yolox_nano yolox_tiny yolox_m
 
 # Download with ONNX simplification (recommended)
-python download_yolox.py --model yolox_nano --simplify
+python prepare_model.py --model yolox_nano --simplify
 
 # Download and verify accuracy on COCO val2017
-python download_yolox.py --model yolox_nano --verify --num-val-images 500
+python prepare_model.py --model yolox_nano --verify --num-val-images 500
 ```
 
 The script will automatically:

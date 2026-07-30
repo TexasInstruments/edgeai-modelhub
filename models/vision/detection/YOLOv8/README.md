@@ -75,16 +75,16 @@ Models are exported from Ultralytics PyTorch checkpoints to ONNX using the provi
 
 ```bash
 # Export nano variant (default)
-python ultralytics_yolo8_export.py
+python prepare_model.py
 
 # Export specific variants
-python ultralytics_yolo8_export.py --models yolov8n yolov8m
+python prepare_model.py --models yolov8n yolov8m
 
 # Export all variants
-python ultralytics_yolo8_export.py --models yolov8n yolov8s yolov8m yolov8l yolov8x
+python prepare_model.py --models yolov8n yolov8s yolov8m yolov8l yolov8x
 
 # Export with custom output directory
-python ultralytics_yolo8_export.py --models yolov8n --output-dir ./exports
+python prepare_model.py --models yolov8n --output-dir ./exports
 ```
 
 The script will automatically:

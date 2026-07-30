@@ -25,15 +25,15 @@ Input shape constraints:
   custom --shape that violates the constraint will raise a clear error.
 
 Usage:
-  python download_rfdetr.py
-  python download_rfdetr.py --model rfdetr_nano
-  python download_rfdetr.py --model rfdetr_nano rfdetr_small rfdetr_medium
-  python download_rfdetr.py --model rfdetr_large --shape 640 640
-  python download_rfdetr.py --model rfdetr_nano --backbone-only
-  python download_rfdetr.py --model rfdetr_nano --opset 18 --output-dir ./exports
-  python download_rfdetr.py --model rfdetr_xlarge rfdetr_2xlarge --plus
-  python download_rfdetr.py --model rfdetr_seg_nano rfdetr_seg_small
-  python download_rfdetr.py --list-models
+  python prepare_model.py
+  python prepare_model.py --model rfdetr_nano
+  python prepare_model.py --model rfdetr_nano rfdetr_small rfdetr_medium
+  python prepare_model.py --model rfdetr_large --shape 640 640
+  python prepare_model.py --model rfdetr_nano --backbone-only
+  python prepare_model.py --model rfdetr_nano --opset 18 --output-dir ./exports
+  python prepare_model.py --model rfdetr_xlarge rfdetr_2xlarge --plus
+  python prepare_model.py --model rfdetr_seg_nano rfdetr_seg_small
+  python prepare_model.py --list-models
 """
 
 from __future__ import annotations

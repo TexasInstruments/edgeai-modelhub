@@ -73,24 +73,24 @@ hf download <REPO_ID> --local-dir <download_location>
 ### Model Download
 The models can be downloaded and converted to ONNX using the provided script.
 
-Each variant has a corresponding `.link` file and can be downloaded with `download_and_convert_rtmdet.py`:
+Each variant has a corresponding `.link` file and can be downloaded with `prepare_model.py`:
 
 ```bash
 # Download specific variants
-python download_and_convert_rtmdet.py --models tiny
-python download_and_convert_rtmdet.py --models s
-python download_and_convert_rtmdet.py --models m
-python download_and_convert_rtmdet.py --models l
-python download_and_convert_rtmdet.py --models x
+python prepare_model.py --models tiny
+python prepare_model.py --models s
+python prepare_model.py --models m
+python prepare_model.py --models l
+python prepare_model.py --models x
 
 # Download multiple variants at once
-python download_and_convert_rtmdet.py --models tiny s m
+python prepare_model.py --models tiny s m
 
 # Download all variants
-python download_and_convert_rtmdet.py
+python prepare_model.py
 
 # Download with ONNX simplification (recommended)
-python download_and_convert_rtmdet.py --models tiny --simplify
+python prepare_model.py --models tiny --simplify
 ```
 
 The script will automatically:

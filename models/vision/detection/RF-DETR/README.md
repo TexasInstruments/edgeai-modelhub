@@ -98,46 +98,46 @@ hf download <REPO_ID> --local-dir <download_location>
 
 ### Model Export
 
-Pretrained COCO weights are downloaded automatically from HuggingFace on first use. Use `download_rfdetr.py` to export any variant to ONNX.
+Pretrained COCO weights are downloaded automatically from HuggingFace on first use. Use `prepare_model.py` to export any variant to ONNX.
 
 ```bash
 # Activate your virtual environment, then:
 
 # List all available variants with accuracy and latency info
-python download_rfdetr.py --list-models
+python prepare_model.py --list-models
 
 # Export the default model (rfdetr_nano)
-python download_rfdetr.py
+python prepare_model.py
 
 # Export a specific variant
-python download_rfdetr.py --model rfdetr_nano
-python download_rfdetr.py --model rfdetr_small
-python download_rfdetr.py --model rfdetr_medium
-python download_rfdetr.py --model rfdetr_large
+python prepare_model.py --model rfdetr_nano
+python prepare_model.py --model rfdetr_small
+python prepare_model.py --model rfdetr_medium
+python prepare_model.py --model rfdetr_large
 
 # Export multiple variants at once
-python download_rfdetr.py --model rfdetr_nano rfdetr_small rfdetr_medium rfdetr_large
+python prepare_model.py --model rfdetr_nano rfdetr_small rfdetr_medium rfdetr_large
 
 # Export XLarge / 2XLarge (requires rfdetr[plus], PML 1.0 license)
-python download_rfdetr.py --model rfdetr_xlarge rfdetr_2xlarge --plus
+python prepare_model.py --model rfdetr_xlarge rfdetr_2xlarge --plus
 
 # Export segmentation variants
-python download_rfdetr.py --model rfdetr_seg_nano rfdetr_seg_small rfdetr_seg_medium rfdetr_seg_large
+python prepare_model.py --model rfdetr_seg_nano rfdetr_seg_small rfdetr_seg_medium rfdetr_seg_large
 
 # Export with a custom input resolution
-python download_rfdetr.py --model rfdetr_medium --shape 608 608
+python prepare_model.py --model rfdetr_medium --shape 608 608
 
 # Export backbone feature extractor only
-python download_rfdetr.py --model rfdetr_nano --backbone-only
+python prepare_model.py --model rfdetr_nano --backbone-only
 
 # Export from a locally trained checkpoint
-python download_rfdetr.py --model rfdetr_medium --weights /path/to/custom.pth
+python prepare_model.py --model rfdetr_medium --weights /path/to/custom.pth
 
 # Export with a specific ONNX opset version
-python download_rfdetr.py --model rfdetr_nano --opset 18
+python prepare_model.py --model rfdetr_nano --opset 18
 
 # Save to a custom output directory
-python download_rfdetr.py --model rfdetr_nano --output-dir ./exports
+python prepare_model.py --model rfdetr_nano --output-dir ./exports
 ```
 
 The script will automatically:

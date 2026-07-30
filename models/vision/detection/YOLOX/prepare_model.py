@@ -17,13 +17,13 @@ ONNX release : v0.1.1rc0
 PTH  release : 0.0.1 (storage repo)
 
 Usage:
-  python download_yolox.py --model yolox_nano
-  python download_yolox.py --model yolox_s yolox_m
-  python download_yolox.py --model yolox_nano yolox_s --verify
-  python download_yolox.py --model yolox_l --num-val-images 50
-  python download_yolox.py --model yolox_x yolox_darknet53 --verify --coco-dir /path/to/coco
-  python download_yolox.py --model yolox_nano --simplify
-  python download_yolox.py --model yolox_s yolox_m --verify --simplify
+  python prepare_model.py --model yolox_nano
+  python prepare_model.py --model yolox_s yolox_m
+  python prepare_model.py --model yolox_nano yolox_s --verify
+  python prepare_model.py --model yolox_l --num-val-images 50
+  python prepare_model.py --model yolox_x yolox_darknet53 --verify --coco-dir /path/to/coco
+  python prepare_model.py --model yolox_nano --simplify
+  python prepare_model.py --model yolox_s yolox_m --verify --simplify
 """
 
 import argparse
