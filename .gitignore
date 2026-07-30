@@ -1,0 +1,13 @@
+.idea/*
+.vscode/*
+
+*.pyc
+*.so
+*.o
+
+.eggs/*
+*.egg-info/*
+*/*.egg-info/*
+
+*.tar.gz
+
