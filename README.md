@@ -55,6 +55,7 @@ Models are compiled and deployed using:
 | Model | Capabilities | Variants | Input | Performance | License | Docs |
 |-------|--------------|----------|-------|-------------|---------|------|
 | **ResNet-50** | 🖼️ Image Classification | v1.5 | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
+| **RF-DETR** | 🎯 Object Detection | nano, s, m, l | 384–704px | 48.4-56.5% mAP | Apache 2.0 | [📖](models/vision/detection/RF-DETR/) |
 | **RTMDet** | 🎯 Object Detection | tiny, s, m, l, x | 640×640 | 40.9-52.8% mAP | Apache 2.0 | [📖](models/vision/detection/RTMDet/) |
 | **YOLO11** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 39.5-54.7% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO11/) |
 | **YOLO26** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 57.5-66.0% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO26/) |
@@ -101,6 +102,7 @@ Detailed setup, usage, and deployment guides for each model:
 | Model | Documentation |
 |-------|---------------|
 | 🖼️ ResNet-50 Classification | [Read](models/vision/classification/resnet/README.md) |
+| 🎯 RF-DETR Detection | [Read](models/vision/detection/RF-DETR/README.md) |
 | 🎯 RTMDet Detection | [Read](models/vision/detection/RTMDet/README.md) |
 | 🎯 YOLO11 Detection | [Read](models/vision/detection/YOLO11/README.md) |
 | 🎯 YOLO26 Detection | [Read](models/vision/detection/YOLO26/README.md) |
@@ -148,7 +150,7 @@ Main repository & documentation
 
 ## 📜 License
 
-- 📄 **ResNet-50, RTMDet, YOLOX**: Apache 2.0
+- 📄 **ResNet-50, RF-DETR, RTMDet, YOLOX**: Apache 2.0
 - 📄 **YOLO11, YOLO26, YOLOv8**: AGPL 3.0
 
 ---
