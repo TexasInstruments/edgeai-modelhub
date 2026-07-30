@@ -28,7 +28,7 @@
 
 
 # ---------------------------------------------------------------------------
-# Script: ultralytics_yolo8_export.py
+# Script: prepare_model.py
 #
 # Purpose:
 #   Export one or more YOLOv8 model variants (n / s / m / l / x) to ONNX
@@ -38,16 +38,16 @@
 #
 # Usage examples:
 #   # Export only yolov8n (default behaviour)
-#   python ultralytics_yolo8_export.py
+#   python prepare_model.py
 #
 #   # Export specific variants
-#   python ultralytics_yolo8_export.py --models yolov8n yolov8s
+#   python prepare_model.py --models yolov8n yolov8s
 #
 #   # Export all variants
-#   python ultralytics_yolo8_export.py --models yolov8n yolov8s yolov8m yolov8l yolov8x
+#   python prepare_model.py --models yolov8n yolov8s yolov8m yolov8l yolov8x
 #
 #   # Export to a custom directory in TorchScript format
-#   python ultralytics_yolo8_export.py --models yolov8n --format torchscript --output-dir ./exports
+#   python prepare_model.py --models yolov8n --format torchscript --output-dir ./exports
 # ---------------------------------------------------------------------------
 
 import argparse
