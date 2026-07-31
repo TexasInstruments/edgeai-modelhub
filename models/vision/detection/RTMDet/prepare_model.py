@@ -686,6 +686,7 @@ def main():
         'tqdm': 'tqdm',
         'onnx': 'onnx',
         'onnxsim': 'onnxsim',
+        'onnxscript': 'onnxscript',
     })
 
     # Generate link files only for the selected models

@@ -85,6 +85,7 @@ def read_url_from_link_file(link_path: str) -> str:
 # torch / onnx are only needed for the .pth → .onnx conversion fallback;
 # they are added dynamically inside convert_pth_to_onnx() if required.
 REQUIRED_PACKAGES: dict[str, str] = {
+    "onnx":    "onnx",
     "onnxsim": "onnx-simplifier",
 }
 

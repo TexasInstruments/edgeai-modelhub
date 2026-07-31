@@ -45,10 +45,24 @@ Example:
      https://huggingface.co/Ultralytics/YOLO11/blob/main/yolo11n.pt -o yolo11n.pt
 """
 
-import onnx
 import sys
 import subprocess
 from pathlib import Path
+
+
+def _ensure_dependencies():
+    required = {"onnx": "onnx", "onnxsim": "onnx-simplifier", "ultralytics": "ultralytics"}
+    for module, package in required.items():
+        try:
+            __import__(module)
+        except ImportError:
+            print(f"Installing missing dependency: {package}")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
+_ensure_dependencies()
+
+import onnx
 from onnx import shape_inference
 import argparse
 
