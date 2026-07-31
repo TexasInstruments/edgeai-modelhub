@@ -55,6 +55,7 @@ Models are compiled and deployed using:
 | Model | Capabilities | Variants | Input | Performance | License | Docs |
 |-------|--------------|----------|-------|-------------|---------|------|
 | **ResNet-50** | 🖼️ Image Classification | v1.5 | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
+| **DETR** | 🎯 Object Detection | detr_resnet50, detr_resnet50_dc5, detr_resnet101, detr_resnet101_dc5 | 800×800 (flexible) | AP50:95 42.0-44.9, AP50 62.4-64.7 (detection) | Apache 2.0 | [📖](models/vision/detection/DETR/) |
 | **RF-DETR** | 🎯 Object Detection | nano, s, m, l | 384–704px | 48.4-56.5% mAP | Apache 2.0 | [📖](models/vision/detection/RF-DETR/) |
 | **RTMDet** | 🎯 Object Detection | tiny, s, m, l, x | 640×640 | 40.9-52.8% mAP | Apache 2.0 | [📖](models/vision/detection/RTMDet/) |
 | **YOLO11** | 🎯 Object Detection | n, s, m, l, x | 640×640 | 39.5-54.7% mAP | AGPL 3.0 | [📖](models/vision/detection/YOLO11/) |
@@ -102,6 +103,7 @@ Detailed setup, usage, and deployment guides for each model:
 | Model | Documentation |
 |-------|---------------|
 | 🖼️ ResNet-50 Classification | [Read](models/vision/classification/resnet/README.md) |
+| 🎯 DETR Detection | [Read](models/vision/detection/DETR/README.md) |
 | 🎯 RF-DETR Detection | [Read](models/vision/detection/RF-DETR/README.md) |
 | 🎯 RTMDet Detection | [Read](models/vision/detection/RTMDet/README.md) |
 | 🎯 YOLO11 Detection | [Read](models/vision/detection/YOLO11/README.md) |
