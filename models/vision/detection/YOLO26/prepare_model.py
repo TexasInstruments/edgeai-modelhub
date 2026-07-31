@@ -43,10 +43,24 @@ Example:
     https://huggingface.co/.../model.onnx -o yolo26n.onnx
 """
 
-import onnx
 import sys
 import subprocess
 from pathlib import Path
+
+
+def _ensure_dependencies():
+    required = {"onnx": "onnx", "onnxsim": "onnx-simplifier"}
+    for module, package in required.items():
+        try:
+            __import__(module)
+        except ImportError:
+            print(f"Installing missing dependency: {package}")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
+_ensure_dependencies()
+
+import onnx
 from onnx import shape_inference
 import argparse
 
