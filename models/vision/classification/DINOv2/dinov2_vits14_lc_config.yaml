@@ -1,0 +1,31 @@
+task_type: classification
+dataloader:
+  name: image_classification_dataloader
+  path: ./data/datasets/imagenetv2c/val
+postprocess: {}
+preprocess:
+  resize: 256
+  crop: 224
+  data_layout: NCHW
+  reverse_channels: false
+  backend: pil
+  interpolation: null
+  resize_with_pad: false
+  pad_color: 0
+session:
+  session_name: onnxrt
+  target_device: null
+  input_optimization: false
+  input_data_layout: NCHW
+  input_mean: [123.675, 116.28, 103.53]
+  input_scale: [0.017125, 0.017507, 0.017429]
+  model_path: dinov2_vits14_lc.onnx
+  model_id: cl-mh6010
+  input_details: null
+  output_details: null
+  num_inputs: 1
+model_info:
+  metric_reference:
+    accuracy_top1%: 81.1
+  compact_name: DINOv2-ViT-S/14
+  shortlisted: true
