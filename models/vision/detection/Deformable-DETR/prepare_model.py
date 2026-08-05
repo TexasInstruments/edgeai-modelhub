@@ -35,6 +35,7 @@ Usage:
   python prepare_model.py --model deformable_detr --weights /path/to/checkpoint.pth
   python prepare_model.py --model deformable_detr --opset 18 --output-dir ./exports
   python prepare_model.py --model deformable_detr --skip-simplify
+  python prepare_model.py --model all
   python prepare_model.py --list-models
 """
 
@@ -555,6 +556,130 @@ def print_model_table() -> None:
 
 
 # ─────────────────────────────────────────────
+# Float64 removal
+# ─────────────────────────────────────────────
+
+def fix_float64_nodes(src_path: str) -> bool:
+    """Remove Cast-to-DOUBLE nodes and fix float64 initializers/constants
+    so the model is compatible with TIDL (which does not support float64).
+
+    torch.onnx.export inserts Cast(to=DOUBLE) nodes when Python-level float
+    literals (e.g. math.pi, which is float64) appear in position-encoding
+    computations.  These nodes propagate float64 through most of the graph.
+
+    Strategy:
+      1. Find every Cast node with to=DOUBLE.
+      2. Re-wire each consumer of the Cast's output to use the Cast's input
+         (the upstream float32 tensor) directly, then delete the Cast node.
+      3. Convert any float64 graph initializers to float32.
+      4. Fix any Constant/ConstantOfShape attribute tensors that are DOUBLE.
+      5. Validate with onnx.checker and save in-place.
+
+    Args:
+        src_path: Path to the .onnx file to fix (modified in-place).
+
+    Returns:
+        True on success or if no float64 tensors were found.
+    """
+    import numpy as np  # noqa: PLC0415
+    try:
+        import onnx                              # noqa: PLC0415
+        from onnx import TensorProto, numpy_helper  # noqa: PLC0415
+    except ImportError:
+        print("  [WARN] onnx not installed – skipping float64 fix.")
+        return True
+
+    try:
+        model = onnx.load(src_path)
+    except Exception as exc:
+        print(f"  [ERROR] Failed to load {src_path}: {exc}")
+        return False
+
+    graph = model.graph
+
+    # Step 1 – Remove Cast-to-DOUBLE by re-wiring consumers to use Cast input.
+    consumers: dict = {}
+    for node in graph.node:
+        for inp in node.input:
+            consumers.setdefault(inp, []).append(node)
+
+    removed = 0
+    for node in list(graph.node):
+        if node.op_type != "Cast":
+            continue
+        for attr in node.attribute:
+            if attr.name == "to" and attr.i == TensorProto.DOUBLE:
+                cast_in  = node.input[0]
+                cast_out = node.output[0]
+                for consumer in consumers.get(cast_out, []):
+                    consumer.input[:] = [
+                        cast_in if t == cast_out else t
+                        for t in consumer.input
+                    ]
+                graph.node.remove(node)
+                removed += 1
+                break
+
+    # Step 2 – Convert float64 graph initializers to float32.
+    init_fixed = 0
+    for init in graph.initializer:
+        if init.data_type == TensorProto.DOUBLE:
+            arr = numpy_helper.to_array(init).astype(np.float32)
+            init.CopyFrom(numpy_helper.from_array(arr, name=init.name))
+            init_fixed += 1
+
+    # Step 3 – Fix Constant/ConstantOfShape nodes with float64 value tensors.
+    # Use attr.type == TENSOR (the correct API) instead of attr.HasField("t"),
+    # which is unreliable across protobuf versions.
+    const_fixed = 0
+    for node in graph.node:
+        for attr in node.attribute:
+            if (attr.type == onnx.AttributeProto.TENSOR
+                    and attr.t.data_type == TensorProto.DOUBLE):
+                arr = numpy_helper.to_array(attr.t).astype(np.float32)
+                attr.t.CopyFrom(numpy_helper.from_array(arr))
+                const_fixed += 1
+
+    # Step 4 – Update stale float64 type annotations in value_info.
+    # onnxsim stores intermediate tensor types in graph.value_info.  When Cast-
+    # to-DOUBLE nodes are removed the stored annotations become stale and still
+    # say float64, which causes type-inference errors in TIDL and ONNX tools
+    # even though the actual computation is now float32.
+    vi_fixed = 0
+    for vi in list(graph.value_info) + list(graph.input) + list(graph.output):
+        if (vi.type.HasField("tensor_type")
+                and vi.type.tensor_type.elem_type == TensorProto.DOUBLE):
+            vi.type.tensor_type.elem_type = TensorProto.FLOAT
+            vi_fixed += 1
+
+    print(
+        f"[F64]  Cast-to-DOUBLE removed: {removed}, "
+        f"initializers fixed: {init_fixed}, constants fixed: {const_fixed}, "
+        f"type annotations fixed: {vi_fixed}"
+    )
+
+    if removed == 0 and init_fixed == 0 and const_fixed == 0 and vi_fixed == 0:
+        print("[F64]  No float64 tensors found – model already clean.")
+        return True
+
+    try:
+        onnx.checker.check_model(model)
+        print("[F64]  ONNX model validation passed after float64 fix.")
+    except Exception as exc:
+        print(f"[WARN] ONNX validation after float64 fix: {exc}")
+
+    try:
+        onnx.save(model, src_path)
+    except Exception as exc:
+        print(f"  [ERROR] Failed to save fixed model: {exc}")
+        return False
+
+    size_mb = os.path.getsize(src_path) / (1024 * 1024)
+    print(f"[OK]   Float64-free model saved: {src_path}  ({size_mb:.1f} MB)")
+    return True
+
+
+# ─────────────────────────────────────────────
 # Core export
 # ─────────────────────────────────────────────
 
@@ -629,6 +754,14 @@ def export_model(
         weights_path = os.path.join(output_dir, f"{model_key}.pth")
         if not download_weights(info["gdrive_id"], weights_path, force=force):
             print(f"[ERROR] Failed to download weights for '{model_key}'.")
+            print(
+                "\n[TIP]  The default export method (torch) downloads weights from\n"
+                "       Google Drive, which may be unreachable on corporate networks.\n"
+                "       Try the HuggingFace-based method instead — no Google Drive\n"
+                "       required, proxy-friendly:\n"
+                f"\n"
+                f"         python prepare_model.py --method optimum --model {model_key}\n"
+            )
             sys.exit(1)
 
     # ── Step 4: Build model ───────────────────────────────────────────────────
@@ -746,6 +879,9 @@ def export_model(
     if not skip_simplify:
         simplify_onnx(dst_path, force=force)
 
+    # ── Fix float64 nodes for TIDL compatibility ──────────────────────────────
+    fix_float64_nodes(dst_path)
+
     size_mb = os.path.getsize(dst_path) / (1024 * 1024)
     print(f"\n[SUCCESS] ONNX model saved to: {dst_path}  ({size_mb:.1f} MB)\n")
     return dst_path
@@ -860,6 +996,9 @@ def export_model_optimum(
     if not skip_simplify:
         simplify_onnx(dst_path, force=force)
 
+    # ── Fix float64 nodes for TIDL compatibility ──────────────────────────────
+    fix_float64_nodes(dst_path)
+
     size_mb = os.path.getsize(dst_path) / (1024 * 1024)
     print(f"\n[SUCCESS] ONNX model saved to: {dst_path}  ({size_mb:.1f} MB)\n")
     return dst_path
@@ -891,6 +1030,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  %(prog)s --model deformable_detr --weights /path/to/checkpoint.pth\n"
             "  %(prog)s --model deformable_detr --opset 18 --output-dir ./exports\n"
             "  %(prog)s --model deformable_detr --skip-simplify\n"
+            "  %(prog)s --model all\n"
             "  %(prog)s --list-models"
         ),
     )
@@ -899,10 +1039,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--model",
         nargs="+",
         default=[DEFAULT_MODEL],
-        choices=list(MODEL_CATALOG.keys()),
+        choices=list(MODEL_CATALOG.keys()) + ["all"],
         metavar="VARIANT",
         help=(
             f"Model variant(s) to export. Default: {DEFAULT_MODEL}. "
+            "Use 'all' to export every variant that has not yet been exported. "
             "Run --list-models to see all options."
         ),
     )
@@ -1017,6 +1158,27 @@ def main() -> None:
     if args.list_models:
         print_model_table()
         return
+
+    if "all" in args.model:
+        shape_tag  = f"_{args.shape[0]}x{args.shape[1]}" if args.shape else ""
+        output_dir = os.path.abspath(args.output_dir)
+        pending = [
+            k for k in MODEL_CATALOG
+            if not os.path.exists(os.path.join(output_dir, f"{k}{shape_tag}.onnx"))
+        ]
+        if not pending:
+            print("[INFO] All models already exported. Use --force to re-export.")
+            return
+        skipped = [k for k in MODEL_CATALOG if k not in pending]
+        if skipped:
+            print("[INFO] Already exported (skipping):")
+            for k in skipped:
+                print(f"         {k}")
+        print("[INFO] Will export:")
+        for k in pending:
+            print(f"         {k}")
+        print()
+        args.model = pending
 
     if args.weights and len(args.model) > 1:
         print(

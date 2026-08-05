@@ -113,6 +113,13 @@ python prepare_model.py --model deformable_detr_two_stage
 # Export multiple variants at once
 python prepare_model.py --model deformable_detr deformable_detr_two_stage
 
+# Export all variants (skips any already exported)
+python prepare_model.py --model all
+
+# Use HuggingFace Hub instead of Google Drive (recommended on corporate networks)
+python prepare_model.py --method optimum
+python prepare_model.py --method optimum --model all
+
 # Export with a custom input resolution
 python prepare_model.py --model deformable_detr --shape 640 640
 
@@ -130,31 +137,40 @@ python prepare_model.py --model deformable_detr --force
 
 # Force re-clone of the source repository
 python prepare_model.py --model deformable_detr --force-reclone
+
+# Skip onnx-simplifier step
+python prepare_model.py --model deformable_detr --skip-simplify
 ```
 
 The script will automatically:
 1. Install missing dependencies (torch, torchvision, onnx, scipy, gdown) if not present
-2. Clone the Deformable-DETR repository from GitHub into `~/.cache/deformable_detr` on first use
+2. Clone the Deformable-DETR repository from GitHub into `~/.cache/deformable_detr` on first use (or download from HuggingFace Hub with `--method optimum`)
 3. Install a pure-Python fallback for the multi-scale deformable attention module (no CUDA compilation required)
-4. Download pretrained COCO weights from Google Drive via `gdown`
+4. Download pretrained COCO weights from Google Drive via `gdown` (or from HuggingFace Hub with `--method optimum`)
 5. Build the model from source with the correct architecture flags
 6. Wrap the model to accept a plain `(N, 3, H, W)` tensor (handles `NestedTensor` internally)
 7. Export to ONNX with constant folding enabled
-8. Validate the exported ONNX graph
-9. Save as `<model_key>.onnx` in the output directory
+8. Simplify the ONNX graph with onnx-simplifier (unless `--skip-simplify`)
+9. Fix float64 nodes for TIDL compatibility (removes Cast-to-DOUBLE, updates stale type annotations)
+10. Validate the exported ONNX graph
+11. Save as `<model_key>.onnx` in the output directory
+
+> **Corporate Network Tip:** If Google Drive is blocked by your proxy, use `--method optimum` to download weights directly from HuggingFace Hub instead.
 
 #### Export script parameters
 
 | Flag               | Default                  | Description                                               |
 | -                  | -                        | -                                                         |
-| `--model`          | `deformable_detr`        | One or more variant names. See `--list-models`.           |
+| `--model`          | `deformable_detr`        | One or more variant names, or `all` to export every missing variant. See `--list-models`. |
+| `--method`         | `torch`                  | Export method: `torch` (Google Drive weights) or `optimum` (HuggingFace Hub, proxy-friendly). |
 | `--shape H W`      | `800 800`                | Custom input resolution (height width).                   |
 | `--opset`          | `17`                     | ONNX opset version.                                       |
 | `--batch-size`     | `1`                      | Batch size embedded in the exported graph.                |
-| `--weights`        | COCO pretrained          | Path to a local `.pth` checkpoint.                        |
+| `--weights`        | COCO pretrained          | Path to a local `.pth` checkpoint (ignored with `--method optimum`). |
 | `--output-dir`     | Script directory         | Directory where `.onnx` and `.pth` files are saved.       |
 | `--force`          | `False`                  | Re-export and re-download even if files already exist.    |
 | `--force-reclone`  | `False`                  | Re-clone the source repository (removes cached copy).     |
+| `--skip-simplify`  | `False`                  | Skip the onnx-simplifier step.                            |
 | `--quiet`          | `False`                  | Suppress verbose progress messages.                       |
 | `--list-models`    | —                        | Print model catalogue table and exit.                     |
 
@@ -273,4 +289,4 @@ To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
 
 **License:** Apache 2.0  
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** August 2026
+**Last Updated:** August 2026 (v2: added `--model all`, `--method optimum`, float64 TIDL fix)
