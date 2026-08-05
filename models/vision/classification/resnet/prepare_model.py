@@ -213,7 +213,7 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=22
                 check_n=3,
                 perform_optimization=True,
                 skip_fuse_bn=False,
-                input_shapes={input_tensor.name: new_shape}
+                overwrite_input_shapes={input_tensor.name: new_shape}
             )
 
             if check:
