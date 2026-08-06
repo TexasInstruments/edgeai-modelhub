@@ -57,6 +57,7 @@ Models are compiled and deployed using:
 | **ResNet-50** | 🖼️ Image Classification | v1.5 | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
 | **DINOv2** | 🖼️ Image Classification | ViT-S/14, ViT-B/14 (w/ & w/o registers) | 224×224 | 80.9–84.6% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINOv2/) |
 | **DETR** | 🎯 Object Detection | detr_resnet50, detr_resnet50_dc5, detr_resnet101, detr_resnet101_dc5 | 800×800 (flexible) | AP50:95 42.0-44.9, AP50 62.4-64.7 (detection) | Apache 2.0 | [📖](models/vision/detection/DETR/) |
+| **Deformable-DETR** | 🎯 Object Detection | single-scale, multi-scale, +bbox refine, two-stage | 800×800 | AP50:95 39.4-46.9% | Apache 2.0 | [📖](models/vision/detection/Deformable-DETR/) |
 | **RF-DETR** | 🎯 Object Detection | nano, s, m, l | 384–704px | 48.4-56.5% mAP | Apache 2.0 | [📖](models/vision/detection/RF-DETR/) |
 | **RT-DETRv2** | 🎯 Object Detection | s, ms, m, l, x | 640×640 | 48.1-54.3% mAP | Apache 2.0 | [📖](models/vision/detection/RT-DETRv2/) |
 | **RTMDet** | 🎯 Object Detection | tiny, s, m, l, x | 640×640 | 40.9-52.8% mAP | Apache 2.0 | [📖](models/vision/detection/RTMDet/) |
@@ -107,6 +108,7 @@ Detailed setup, usage, and deployment guides for each model:
 | 🖼️ ResNet-50 Classification | [Read](models/vision/classification/resnet/README.md) |
 | 🖼️ DINOv2 Classification | [Read](models/vision/classification/DINOv2/README.md) |
 | 🎯 DETR Detection | [Read](models/vision/detection/DETR/README.md) |
+| 🎯 Deformable-DETR Detection | [Read](models/vision/detection/Deformable-DETR/README.md) |
 | 🎯 RF-DETR Detection | [Read](models/vision/detection/RF-DETR/README.md) |
 | 🎯 RT-DETRv2 Detection | [Read](models/vision/detection/RT-DETRv2/README.md) |
 | 🎯 RTMDet Detection | [Read](models/vision/detection/RTMDet/README.md) |
@@ -156,7 +158,7 @@ Main repository & documentation
 
 ## 📜 License
 
-- 📄 **ResNet-50, DINOv2, RF-DETR, RT-DETRv2, RTMDet, YOLOX**: Apache 2.0
+- 📄 **ResNet-50, DINOv2, DETR, Deformable-DETR, RF-DETR, RT-DETRv2, RTMDet, YOLOX**: Apache 2.0
 - 📄 **YOLO11, YOLO26, YOLOv8**: AGPL 3.0
 
 ---
