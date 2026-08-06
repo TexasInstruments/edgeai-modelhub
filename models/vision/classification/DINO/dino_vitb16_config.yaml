@@ -1,0 +1,34 @@
+task_type: classification
+#dataset_category: imagenet
+#calibration_dataset: imagenet
+#input_dataset: imagenet
+dataloader:
+  name: image_classification_dataloader
+  path: ./data/datasets/imagenetv2c/val
+postprocess: {}
+preprocess:
+  resize: 256
+  crop: 224
+  data_layout: NCHW
+  reverse_channels: false
+  backend: pil
+  interpolation: null
+  resize_with_pad: false
+  pad_color: 0
+session:
+  session_name: onnxrt
+  target_device: null
+  input_optimization: false
+  input_data_layout: NCHW
+  input_mean: [123.675, 116.28, 103.53]
+  input_scale: [0.017125, 0.017507, 0.017429]
+  model_path: dino_vitb16.onnx
+  model_id: cl-mh6018
+  input_details: null
+  output_details: null
+  num_inputs: 1
+model_info:
+  metric_reference:
+    accuracy_top1%: 78.2
+  compact_name: DINO-ViT-B/16
+  shortlisted: true
