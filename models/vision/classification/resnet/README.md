@@ -24,7 +24,7 @@ datasets:
 
 ## 📋 Overview
 
-**ResNet-50** is a 50-layer deep convolutional neural network optimized for **Texas Instruments MPU devices**. This production-ready model delivers industry-leading accuracy on ImageNet classification while maintaining efficient computation suitable for edge deployment.
+**ResNet-50** is a 50-layer deep convolutional neural network optimized for **Texas Instruments MPU devices**. This folder provides two production-ready ONNX variants that deliver industry-leading accuracy on ImageNet classification while maintaining efficient computation suitable for edge deployment.
 
 ✅ **25.6M Parameters** - Efficient architecture  
 ✅ **76.15% Top-1 Accuracy** - ImageNet benchmark  
@@ -33,19 +33,21 @@ datasets:
 
 ---
 
-## 📊 Model Specifications
+## 📊 Model Variants
 
-| Property | Value |
-|----------|-------|
-| **Model ID** | `cl-6110` |
-| **Architecture** | ResNet-50 v1.5 |
-| **Input Size** | 224×224 RGB |
-| **Parameters** | ~25.6M |
-| **Computation** | 4.1 GigaMACs |
-| **Top-1 Accuracy** | 76.15% |
-| **Framework** | ONNX |
-| **License** | Apache 2.0 |
-| **Training Dataset** | ImageNet-1K |
+| Property | resNet50 | resnet50-v1-7 |
+|----------|----------|---------------|
+| **Model ID** | `cl-mh6000` | `cl-mh6001` |
+| **ONNX File** | `resnet50.onnx` | `resnet50-v1-7.onnx` |
+| **Config File** | `resnet50_config.yaml` | `resnet50-v1-7_config.yaml` |
+| **Input Size** | 224×224 RGB | 224×224 RGB |
+| **Parameters** | ~25.6M | ~25.6M |
+| **Computation** | 4.1 GigaMACs | 4.1 GigaMACs |
+| **Top-1 Accuracy** | 76.15% | 76.15% |
+| **Framework** | ONNX | ONNX |
+| **License** | Apache 2.0 | Apache 2.0 |
+| **Training Dataset** | ImageNet-1K | ImageNet-1K |
+| **Source** | [onnx-community/resnet-50-ONNX](https://huggingface.co/onnx-community/resnet-50-ONNX) | [onnxmodelzoo/resnet50-v1-7](https://huggingface.co/onnxmodelzoo/resnet50-v1-7) |
 
 ---
 
@@ -64,11 +66,14 @@ hf download <REPO_ID> --local-dir <download_location>
 pip install onnx>=1.22.0 onnxruntime>=1.23.2
 ```
 
-### 2️⃣ Download Model
+### 2️⃣ Download Models
 
 ```bash
-# Prepare the model with shape fixing
+# Download resNet50 (cl-mh6000)
 python prepare_model.py --link-file resnet50.onnx.link
+
+# Download resnet50-v1-7 (cl-mh6001)
+python prepare_model.py --link-file resnet50-v1-7.onnx.link
 ```
 
 The script automatically:
@@ -81,8 +86,13 @@ The script automatically:
 **Using TIDL Runner (Recommended):**
 
 ```bash
+# resNet50
 tidlrunner-cli compile --target_device J784S4 \
   --config_path resnet50_config.yaml
+
+# resnet50-v1-7
+tidlrunner-cli compile --target_device J784S4 \
+  --config_path resnet50-v1-7_config.yaml
 ```
 
 **Using TIDL Tools (Advanced):**
@@ -96,8 +106,13 @@ cd edgeai-tidl-tools
 ### 4️⃣ Evaluate Performance
 
 ```bash
+# resNet50
 tidlrunner-cli evaluate --target_device J784S4 \
   --config_path resnet50_config.yaml
+
+# resnet50-v1-7
+tidlrunner-cli evaluate --target_device J784S4 \
+  --config_path resnet50-v1-7_config.yaml
 ```
 
 ---
@@ -236,7 +251,7 @@ Flexible scaling
 
 **License:** Apache 2.0  
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** July 2026
+**Last Updated:** August 2026
 
 [🏠 Back to Model Hub](../../README.md)
 

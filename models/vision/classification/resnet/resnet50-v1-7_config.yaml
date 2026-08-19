@@ -29,7 +29,7 @@ session:
   - 0.017507
   - 0.017429
   model_path: resnet50-v1-7.onnx
-  model_id: cl-mh6003
+  model_id: cl-mh6001
   input_details: null
   output_details: null
   num_inputs: 1
