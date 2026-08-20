@@ -54,7 +54,8 @@ Models are compiled and deployed using:
 
 | Model | Capabilities | Variants | Input | Performance | License | Docs |
 |-------|--------------|----------|-------|-------------|---------|------|
-| **ResNet-50** | 🖼️ Image Classification | resNet50 (cl-mh6000), resnet50-v1 (cl-mh6001) | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
+| **MobileNetV3** | 🖼️ Image Classification | large | 224×224 | 75.3% Top-1 | BSD-3-Clause | [📖](models/vision/classification/MobileNetV3/) |
+| **ResNet-50** | 🖼️ Image Classification | v1.5 | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
 | **DINO** | 🖼️ Image Classification | ViT-S/16, ViT-S/8, ViT-B/16, ViT-B/8, ResNet-50 | 224×224 | 75.3–80.1% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINO/) |
 | **DINOv2** | 🖼️ Image Classification | ViT-S/14, ViT-B/14 (w/ & w/o registers) | 224×224 | 80.9–84.6% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINOv2/) |
 | **DEIMv2** | 🎯 Object Detection | atto, femto, pico, n, s, m, l, x | 320–640px | 23.8–57.8% mAP | Apache 2.0 | [📖](models/vision/detection/DEIMv2/) |
@@ -107,6 +108,7 @@ Detailed setup, usage, and deployment guides for each model:
 
 | Model | Documentation |
 |-------|---------------|
+| 🖼️ MobileNetV3 Classification | [Read](models/vision/classification/MobileNetV3/README.md) |
 | 🖼️ ResNet-50 Classification | [Read](models/vision/classification/resnet/README.md) |
 | 🖼️ DINO Classification | [Read](models/vision/classification/DINO/README.md) |
 | 🖼️ DINOv2 Classification | [Read](models/vision/classification/DINOv2/README.md) |
@@ -162,6 +164,7 @@ Main repository & documentation
 
 ## 📜 License
 
+- 📄 **MobileNetV3**: BSD-3-Clause
 - 📄 **ResNet-50, DINO, DINOv2, DEIMv2, DETR, Deformable-DETR, RF-DETR, RT-DETRv2, RTMDet, YOLOX**: Apache 2.0
 - 📄 **YOLO11, YOLO26, YOLOv8**: AGPL 3.0
 
