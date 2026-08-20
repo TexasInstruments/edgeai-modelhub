@@ -28,7 +28,7 @@ session:
   - 0.017125
   - 0.017507
   - 0.017429
-  model_path: resnet50-v1-7.onnx
+  model_path: resnet50-v1.onnx
   model_id: cl-mh6001
   input_details: null
   output_details: null
@@ -36,5 +36,5 @@ session:
 model_info:
   metric_reference:
     accuracy_top1%: 76.15
-  compact_name: resnet50-v1-7
+  compact_name: resnet50-v1
   shortlisted: true
