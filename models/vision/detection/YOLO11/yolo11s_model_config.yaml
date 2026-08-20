@@ -27,16 +27,17 @@ session:
   - 0.003922
   - 0.003922
   - 0.003922
-  # runtime_options:
-    # advanced_options:output_feature_16bit_names_list: ''
-    # advanced_options:params_16bit_names_list: ''
-    # object_detection:meta_arch_type: 6
+  runtime_options:
+    advanced_options:output_feature_16bit_names_list: /model.23/Sigmoid_output_0,  /model.23/Concat_output_0
+    object_detection:meta_arch_type: 6
+    object_detection:confidence_threshold: 0.001
   model_path: yolo11s.onnx
   model_id: od-mh8005
   input_details: null
   output_details: null
   num_inputs: 1
 postprocess:
+  detection_nms_threshold: 0.7
   reshape_list: null
   formatter: 
       name: DetectionXYWH2XYXYCenterXY
