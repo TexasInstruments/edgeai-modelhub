@@ -54,7 +54,7 @@ Models are compiled and deployed using:
 
 | Model | Capabilities | Variants | Input | Performance | License | Docs |
 |-------|--------------|----------|-------|-------------|---------|------|
-| **ResNet-50** | 🖼️ Image Classification | v1.5 | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
+| **ResNet-50** | 🖼️ Image Classification | resNet50 (cl-mh6000), resnet50-v1 (cl-mh6001) | 224×224 | 76.15% Top-1 | Apache 2.0 | [📖](models/vision/classification/resnet/) |
 | **DINO** | 🖼️ Image Classification | ViT-S/16, ViT-S/8, ViT-B/16, ViT-B/8, ResNet-50 | 224×224 | 75.3–80.1% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINO/) |
 | **DINOv2** | 🖼️ Image Classification | ViT-S/14, ViT-B/14 (w/ & w/o registers) | 224×224 | 80.9–84.6% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINOv2/) |
 | **DEIMv2** | 🎯 Object Detection | atto, femto, pico, n, s, m, l, x | 320–640px | 23.8–57.8% mAP | Apache 2.0 | [📖](models/vision/detection/DEIMv2/) |
