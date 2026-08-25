@@ -33,12 +33,12 @@ Pretrained weights are sourced from **torchvision** (BSD-3-Clause), trained on I
 
 ## Model Variants
 
-| Model ID | Variant | Backbone | Patch Size | Params | GFLOPs | Top-1 Acc | Edge Use |
-|---|---|---|---|---|---|---|---|
-| `cl-mh6030` | `vit_b_16` | ViT-Base | 16×16 | 86.6M | 17.56 | **81.1%** | Recommended |
-| `cl-mh6031` | `vit_b_32` | ViT-Base | 32×32 | 88.2M | 4.41 | **75.9%** | Feasible |
-| `cl-mh6032` | `vit_l_16` | ViT-Large | 16×16 | 304.3M | 61.55 | **79.7%** | Feasible |
-| `cl-mh6033` | `vit_l_32` | ViT-Large | 32×32 | 306.5M | 15.38 | **77.0%** | Feasible |
+| Variant | Backbone | Patch Size | Params | GFLOPs | Top-1 Acc | Edge Use |
+|---|---|---|---|---|---|---|
+| `vit_b_16` | ViT-Base | 16×16 | 86.6M | 17.56 | **81.1%** | Recommended |
+| `vit_b_32` | ViT-Base | 32×32 | 88.2M | 4.41 | **75.9%** | Feasible |
+| `vit_l_16` | ViT-Large | 16×16 | 304.3M | 61.55 | **79.7%** | Feasible |
+| `vit_l_32` | ViT-Large | 32×32 | 306.5M | 15.38 | **77.0%** | Feasible |
 
 > **Recommended:** `vit_b_16` provides the best accuracy among all four variants (81.1%) at moderate compute (17.56 GFLOPs). `vit_b_32` is the lowest-compute option (4.41 GFLOPs) and a good choice for latency-constrained deployments.
 
