@@ -59,6 +59,7 @@ Models are compiled and deployed using:
 | **DINO** | 🖼️ Image Classification | ViT-S/16, ViT-S/8, ViT-B/16, ViT-B/8, ResNet-50 | 224×224 | 75.3–80.1% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINO/) |
 | **DINOv2** | 🖼️ Image Classification | ViT-S/14, ViT-B/14 (w/ & w/o registers) | 224×224 | 80.9–84.6% Top-1 | Apache 2.0 | [📖](models/vision/classification/DINOv2/) |
 | **ViT** | 🖼️ Image Classification | vit_b_16, vit_b_32, vit_l_16, vit_l_32 | 224×224 | 75.9–81.1% Top-1 | BSD-3-Clause | [📖](models/vision/classification/ViT/) |
+| **ConvNeXt** | 🖼️ Image Classification | convnext_tiny, convnext_small, convnext_base, convnext_large | 224×224 | 82.5–84.4% Top-1 | BSD-3-Clause | [📖](models/vision/classification/ConvNeXt/) |
 | **DEIMv2** | 🎯 Object Detection | atto, femto, pico, n, s, m, l, x | 320–640px | 23.8–57.8% mAP | Apache 2.0 | [📖](models/vision/detection/DEIMv2/) |
 | **DETR** | 🎯 Object Detection | detr_resnet50, detr_resnet50_dc5, detr_resnet101, detr_resnet101_dc5 | 800×800 (flexible) | AP50:95 42.0-44.9, AP50 62.4-64.7 (detection) | Apache 2.0 | [📖](models/vision/detection/DETR/) |
 | **Deformable-DETR** | 🎯 Object Detection | single-scale, multi-scale, +bbox refine, two-stage | 800×800 | AP50:95 39.4-46.9% | Apache 2.0 | [📖](models/vision/detection/Deformable-DETR/) |
@@ -114,6 +115,7 @@ Detailed setup, usage, and deployment guides for each model:
 | 🖼️ DINO Classification | [Read](models/vision/classification/DINO/README.md) |
 | 🖼️ DINOv2 Classification | [Read](models/vision/classification/DINOv2/README.md) |
 | 🖼️ ViT Classification | [Read](models/vision/classification/ViT/README.md) |
+| 🖼️ ConvNeXt Classification | [Read](models/vision/classification/ConvNeXt/README.md) |
 | 🎯 DEIMv2 Detection | [Read](models/vision/detection/DEIMv2/README.md) |
 | 🎯 DETR Detection | [Read](models/vision/detection/DETR/README.md) |
 | 🎯 Deformable-DETR Detection | [Read](models/vision/detection/Deformable-DETR/README.md) |
@@ -169,7 +171,7 @@ Main repository & documentation
 - 📄 **MobileNetV3**: BSD-3-Clause
 - 📄 **ResNet-50, DINO, DINOv2, DEIMv2, DETR, Deformable-DETR, RF-DETR, RT-DETRv2, RTMDet, YOLOX**: Apache 2.0
 - 📄 **YOLO11, YOLO26, YOLOv8**: AGPL 3.0
-- 📄 **ViT**: BSD-3-Clause
+- 📄 **ViT, ConvNeXt**: BSD-3-Clause
 
 ---
 
