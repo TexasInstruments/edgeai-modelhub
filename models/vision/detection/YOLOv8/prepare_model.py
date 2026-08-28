@@ -173,14 +173,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '--models',
         nargs='+',
-        choices=ALL_MODELS,
+        choices=ALL_MODELS + ['all'],
         default=DEFAULT_MODELS,
         metavar='MODEL',
         help=(
             "One or more YOLOv8 variants to export.  "
-            f"Choices: {ALL_MODELS}.  "
+            f"Choices: {ALL_MODELS} or 'all'.  "
             f"Default: {DEFAULT_MODELS}."
         ),
+    )
+    parser.add_argument(
+        '--list-models',
+        action='store_true',
+        help='List all supported YOLOv8 model variants and exit.',
     )
 
     parser.add_argument(
@@ -225,16 +230,31 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == '__main__':
     # ------------------------------------------------------------------
-    # 1. Ensure runtime dependencies are available
-    # ------------------------------------------------------------------
-    # 'onnx' is required for ONNX export; 'ultralytics' provides the YOLO API.
-    install_package('onnx')
-    install_package('ultralytics')
-
-    # ------------------------------------------------------------------
-    # 2. Parse CLI arguments
+    # 1. Parse CLI arguments
     # ------------------------------------------------------------------
     args = parse_args()
+
+    if args.list_models:
+        print("Supported YOLOv8 model variants:")
+        for m in ALL_MODELS:
+            print(f"  {m}")
+        sys.exit(0)
+
+    if 'all' in args.models:
+        args.models = list(ALL_MODELS)
+
+    # ------------------------------------------------------------------
+    # 2. Ensure runtime dependencies are available
+    # ------------------------------------------------------------------
+    # 'onnx' is required for ONNX export; 'ultralytics' provides the YOLO API;
+    # 'onnxslim' is used internally by ultralytics' export(simplify=True) (the
+    # default), which replaced the older 'onnxsim' package; 'onnxruntime' is
+    # used internally to validate/load the exported ONNX model. Installing
+    # these upfront avoids ultralytics' own AutoUpdate, which fails offline.
+    install_package('onnx')
+    install_package('ultralytics')
+    install_package('onnxslim')
+    install_package('onnxruntime')
 
     print(f"Models to export : {args.models}")
     print(f"Export format    : {args.format}")

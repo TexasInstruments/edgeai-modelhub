@@ -82,6 +82,10 @@ python prepare_model.py --models yolov8n yolov8m
 
 # Export all variants
 python prepare_model.py --models yolov8n yolov8s yolov8m yolov8l yolov8x
+python prepare_model.py --models all
+
+# List all supported variants
+python prepare_model.py --list-models
 
 # Export with custom output directory
 python prepare_model.py --models yolov8n --output-dir ./exports
