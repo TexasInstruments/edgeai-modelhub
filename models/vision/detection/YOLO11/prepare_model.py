@@ -48,6 +48,7 @@ Example:
 import sys
 import subprocess
 from pathlib import Path
+import argparse
 
 
 def _ensure_dependencies():
@@ -58,13 +59,6 @@ def _ensure_dependencies():
         except ImportError:
             print(f"Installing missing dependency: {package}")
             subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-
-_ensure_dependencies()
-
-import onnx
-from onnx import shape_inference
-import argparse
 
 
 def parse_link_file(link_file_path):
@@ -218,6 +212,9 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=64
     Uses ONNX shape inference to propagate fixed shapes through all intermediate layers.
     Optionally uses onnxsim for additional simplification and optimization.
     """
+    import onnx
+    from onnx import shape_inference
+
     print(f"\n🔧 Fixing Model Shapes:")
     print("=" * 80)
     print(f"Input model: {model_path}")
@@ -364,6 +361,42 @@ def fix_model_shape(model_path, output_path, batch_size=1, channels=3, height=64
 
 # Supported YOLO11 model variants
 YOLO11_VARIANTS = ['yolo11n', 'yolo11s', 'yolo11m', 'yolo11l', 'yolo11x']
+DEFAULT_MODEL = YOLO11_VARIANTS[0]
+
+
+def list_models(script_dir):
+    """
+    Print all supported YOLO11 model variants along with their local status:
+    whether a .link file is present and whether the final ONNX output exists.
+    """
+    col = 14
+    header = f"  {'Variant':<{col}}{'Link file':<12}{'ONNX output':<30}{'Status'}"
+    print("\n" + "=" * len(header))
+    print("  Available YOLO11 model variants")
+    print("=" * len(header))
+    print(header)
+    print("  " + "-" * (len(header) - 2))
+
+    for variant in YOLO11_VARIANTS:
+        link_file = script_dir / f'{variant}.onnx.link'
+
+        if not link_file.exists():
+            print(f"  {variant:<{col}}{'missing':<12}{'-':<30}{'no link file'}")
+            continue
+
+        _, onnx_filename = parse_link_file(link_file)
+        onnx_filename = onnx_filename or '?'
+        final_onnx_output = script_dir / onnx_filename
+
+        if final_onnx_output.exists():
+            file_size = final_onnx_output.stat().st_size
+            status = f"downloaded ({file_size / 1024 / 1024:.1f} MB)"
+        else:
+            status = "not downloaded"
+
+        print(f"  {variant:<{col}}{'ok':<12}{onnx_filename:<30}{status}")
+
+    print("=" * len(header) + "\n")
 
 
 def process_single_model(model_variant, script_dir, args):
@@ -519,8 +552,14 @@ Examples:
   %(prog)s --model yolo11x
 
   # Specify multiple models to process
-  %(prog)s --models yolo11n yolo11s yolo11m
-  %(prog)s --models yolo11l yolo11x
+  %(prog)s --model yolo11n yolo11s yolo11m
+  %(prog)s --model yolo11l yolo11x
+
+  # Prepare every supported model variant
+  %(prog)s --model all
+
+  # List all supported model variants and their local status
+  %(prog)s --list-models
 
   # Specify custom .link file explicitly
   %(prog)s --link-file yolo11n.onnx.link
@@ -542,18 +581,17 @@ Examples:
         """
     )
 
-    parser.add_argument('--model', type=str, default=None,
-                        choices=YOLO11_VARIANTS,
-                        help=f'YOLO11 model variant to prepare. One of: {", ".join(YOLO11_VARIANTS)}. '
-                             f'Sets --link-file to <model>.onnx.link automatically. '
-                             f'Ignored if --link-file is specified explicitly.')
-    parser.add_argument('--models', nargs='+', type=str, default=None,
-                        choices=YOLO11_VARIANTS,
-                        help='List of YOLO11 model variants to prepare. Each model uses <model>.onnx.link. '
-                             f'Ignores --model and --link-file.')
+    parser.add_argument('--model', nargs='+', type=str, default=[DEFAULT_MODEL],
+                        choices=YOLO11_VARIANTS + ['all'],
+                        metavar='VARIANT',
+                        help=f'YOLO11 model variant(s) to prepare. Default: {DEFAULT_MODEL}. '
+                             f'One or more of: {", ".join(YOLO11_VARIANTS)}. '
+                             f"Use 'all' to prepare every supported variant. "
+                             f'Run --list-models to see all options.')
     parser.add_argument('--link-file', type=str, default=None,
                         help='Link file containing download URL for the .pt model '
-                             '(default: yolo11n.onnx.link, or <model>.onnx.link if --model is set)')
+                             '(default: <model>.onnx.link). Ignored if more than one '
+                             '--model variant is specified.')
     parser.add_argument('--batch-size', type=int, default=1,
                         help='Fixed batch size (default: 1)')
     parser.add_argument('--channels', type=int, default=3,
@@ -570,52 +608,48 @@ Examples:
                         help='Skip onnx-simplifier optimization')
     parser.add_argument('--keep-intermediate', action='store_true',
                         help='Keep intermediate downloaded file (the temporary ONNX before shape fixing)')
+    parser.add_argument('--list-models', action='store_true',
+                        help='Print all supported model variants and their local status, then exit.')
 
     args = parser.parse_args()
-
-    # Handle mutually exclusive arguments
-    if args.models and (args.model or args.link_file):
-        print("Warning: --models ignores --model and --link-file arguments")
 
     # Resolve paths
     script_dir = Path(__file__).parent
 
-    # Process models
-    if args.models:
-        # Process multiple models
-        print(f"🚀 Processing {len(args.models)} models: {', '.join(args.models)}")
-        print("=" * 80)
-        
-        success_count = 0
-        for model_variant in args.models:
-            print(f"\n🔄 Processing model: {model_variant}")
-            print("-" * 80)
-            if process_single_model(model_variant, script_dir, args):
-                success_count += 1
-            print(f"\n✅ Completed processing for {model_variant}")
-            print("=" * 80)
-        
-        print(f"\n🎯 SUMMARY: Successfully processed {success_count}/{len(args.models)} models")
-        if success_count == len(args.models):
-            sys.exit(0)
-        else:
-            sys.exit(1)
-    else:
-        # Process single model (existing behavior)
-        # Resolve link file: --link-file takes priority, then --model, then default yolo11n
-        if args.link_file is not None:
-            link_file_name = args.link_file
-        elif args.model is not None:
-            link_file_name = f'{args.model}.onnx.link'
-        else:
-            link_file_name = 'yolo11n.onnx.link'
+    if args.list_models:
+        list_models(script_dir)
+        sys.exit(0)
 
-        # Process the single model using the same function
-        model_variant = link_file_name.replace('.onnx.link', '')
-        if process_single_model(model_variant, script_dir, args):
-            sys.exit(0)
+    if 'all' in args.model:
+        args.model = list(YOLO11_VARIANTS)
+
+    # Resolve which variants to process. --link-file overrides the model name
+    # only when a single model was requested (matches historical behavior).
+    if args.link_file is not None:
+        if len(args.model) > 1:
+            print("Warning: --link-file is ignored when multiple --model variants are specified")
+            models_to_process = args.model
         else:
-            sys.exit(1)
+            models_to_process = [args.link_file.replace('.onnx.link', '')]
+    else:
+        models_to_process = args.model
+
+    _ensure_dependencies()
+
+    print(f"🚀 Processing {len(models_to_process)} model(s): {', '.join(models_to_process)}")
+    print("=" * 80)
+
+    success_count = 0
+    for model_variant in models_to_process:
+        print(f"\n🔄 Processing model: {model_variant}")
+        print("-" * 80)
+        if process_single_model(model_variant, script_dir, args):
+            success_count += 1
+        print(f"\n✅ Completed processing for {model_variant}")
+        print("=" * 80)
+
+    print(f"\n🎯 SUMMARY: Successfully processed {success_count}/{len(models_to_process)} model(s)")
+    sys.exit(0 if success_count == len(models_to_process) else 1)
 
 
 if __name__ == "__main__":
