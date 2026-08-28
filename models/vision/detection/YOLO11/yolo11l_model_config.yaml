@@ -37,6 +37,8 @@ session:
   output_details: null
   num_inputs: 1
 postprocess:
+  detection_nms_threshold: 0.7
+  detection_threshold: 0.001
   reshape_list: null
   formatter: 
       name: DetectionXYWH2XYXYCenterXY
