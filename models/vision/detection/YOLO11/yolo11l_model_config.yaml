@@ -39,7 +39,7 @@ session:
 postprocess:
   enable_nms: 1
   detection_nms_threshold: 0.7
-  detection_threshold: 0.001
+  # detection_threshold: 0.001
   reshape_list: null
   formatter: 
       name: DetectionXYWH2XYXYCenterXY
