@@ -79,6 +79,15 @@ python prepare_model.py --model yolo26m
 python prepare_model.py --model yolo26l
 python prepare_model.py --model yolo26x
 
+# Prepare multiple variants in one run
+python prepare_model.py --model yolo26n yolo26s yolo26m
+
+# Prepare every supported variant
+python prepare_model.py --model all
+
+# List all supported variants and their local download/conversion status
+python prepare_model.py --list-models
+
 # Or specify the .link file directly
 python prepare_model.py --link-file yolo26n.onnx.link
 python prepare_model.py --link-file yolo26s.onnx.link
