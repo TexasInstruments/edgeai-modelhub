@@ -24,6 +24,9 @@ Usage:
   python prepare_model.py --model yolox_x yolox_darknet53 --verify --coco-dir /path/to/coco
   python prepare_model.py --model yolox_nano --simplify
   python prepare_model.py --model yolox_s yolox_m --verify --simplify
+  python prepare_model.py --model all
+  python prepare_model.py --model all --force-download
+  python prepare_model.py --list-models
 """
 
 import argparse
@@ -117,6 +120,45 @@ MODEL_INPUT_SIZE: dict[str, tuple[int, int]] = {
 }
 
 
+def list_models(script_dir: str) -> None:
+    """
+    Print all supported YOLOX model variants along with their local status:
+    whether the .onnx.link / .pth.link files are present and whether the
+    final ONNX output has already been produced.
+
+    Args:
+        script_dir : Directory containing this script (and the .link files).
+    """
+    col = 18
+    header = f"  {'Variant':<{col}}{'ONNX link':<12}{'PTH link':<12}{'Input':<10}{'Status'}"
+    print("\n" + "=" * len(header))
+    print("  Available YOLOX model variants")
+    print("=" * len(header))
+    print(header)
+    print("  " + "-" * (len(header) - 2))
+
+    for variant in MODEL_EXP_NAME:
+        onnx_link_path = os.path.join(script_dir, f"{variant}.onnx.link")
+        pth_link_path  = os.path.join(script_dir, f"{variant}.pth.link")
+        onnx_out_path  = os.path.join(script_dir, f"{variant}.onnx")
+
+        onnx_link_status = "ok" if os.path.exists(onnx_link_path) else "missing"
+        pth_link_status  = "ok" if os.path.exists(pth_link_path) else "missing"
+
+        h, w = MODEL_INPUT_SIZE.get(variant, (640, 640))
+        input_str = f"{h}x{w}"
+
+        if os.path.exists(onnx_out_path):
+            file_size = os.path.getsize(onnx_out_path)
+            status = f"downloaded ({file_size / 1024 / 1024:.1f} MB)"
+        else:
+            status = "not downloaded"
+
+        print(f"  {variant:<{col}}{onnx_link_status:<12}{pth_link_status:<12}{input_str:<10}{status}")
+
+    print("=" * len(header) + "\n")
+
+
 def ensure_dependencies(packages: dict[str, str]) -> None:
     """
     Check that every package in *packages* can be imported.
@@ -193,7 +235,7 @@ def show_progress(block_num: int, block_size: int, total_size: int) -> None:
 # Generic file downloader
 # ─────────────────────────────────────────────
 
-def download_file(url: str, save_path: str, label: str = "file") -> bool:
+def download_file(url: str, save_path: str, label: str = "file", force: bool = False) -> bool:
     """
     Download a single file from *url* to *save_path*.
 
@@ -204,14 +246,18 @@ def download_file(url: str, save_path: str, label: str = "file") -> bool:
         url       : HTTP/HTTPS URL of the file to download.
         save_path : Destination path (directories are created automatically).
         label     : Human-readable name used in log messages.
+        force     : If True, re-download even if *save_path* already exists.
     """
     # Create the destination directory if it does not already exist
     os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
 
-    # Skip download if the file already exists
-    if os.path.exists(save_path):
+    # Skip download if the file already exists (unless a re-download was requested)
+    if os.path.exists(save_path) and not force:
         print(f"[INFO] {label} already exists at: {save_path}")
         return True
+
+    if os.path.exists(save_path) and force:
+        print(f"[INFO] {label} already exists at: {save_path} – forcing re-download.")
 
     print(f"[INFO] Downloading {label} …")
     print(f"       URL  : {url}")
@@ -1113,8 +1159,23 @@ def main() -> None:
         "--model",
         nargs="+",
         default=[MODEL_NAME],
-        choices=list(MODEL_EXP_NAME.keys()),
-        help="YOLOX variant(s) to download. Can specify multiple models.",
+        choices=list(MODEL_EXP_NAME.keys()) + ["all"],
+        help=(
+            "YOLOX variant(s) to download. Can specify multiple models. "
+            "Use 'all' to prepare every supported variant."
+        ),
+    )
+    parser.add_argument(
+        "--list-models",
+        action="store_true",
+        default=False,
+        help="Print all supported YOLOX model variants and their local status, then exit.",
+    )
+    parser.add_argument(
+        "--force-download",
+        action="store_true",
+        default=False,
+        help="Force re-download of the ONNX/PTH source file even if it already exists locally.",
     )
     parser.add_argument(
         "--verify",
@@ -1163,11 +1224,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Whether we need a temporary file for intermediate processing (when simplifying)
-    use_temp_file = args.simplify
-
     # Destination directory – saves alongside this script by default
     save_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # ── --list-models: print status table and exit immediately ─────────────
+    if args.list_models:
+        list_models(save_dir)
+        sys.exit(0)
+
+    # ── Expand 'all' into every supported model variant ─────────────────────
+    if "all" in args.model:
+        args.model = list(MODEL_EXP_NAME.keys())
+
+    # Whether we need a temporary file for intermediate processing (when simplifying)
+    use_temp_file = args.simplify
 
     # Check / install base dependencies once (only needed for simplification)
     ensure_dependencies(REQUIRED_PACKAGES)
@@ -1231,7 +1301,9 @@ def main() -> None:
         else:
             download_path = onnx_path
 
-        onnx_ok = download_file(onnx_url, download_path, label=f"{model_name} ONNX")
+        onnx_ok = download_file(
+            onnx_url, download_path, label=f"{model_name} ONNX", force=args.force_download
+        )
 
         if onnx_ok:
             # ── Post-process: run shape inference on the downloaded ONNX ──────────
@@ -1286,7 +1358,9 @@ def main() -> None:
         print(f"  Strategy 2 – Download .pth checkpoint and convert to ONNX for {model_name}")
         print("=" * 60)
 
-        pth_ok = download_file(pth_url, pth_path, label=f"{model_name} PTH checkpoint")
+        pth_ok = download_file(
+            pth_url, pth_path, label=f"{model_name} PTH checkpoint", force=args.force_download
+        )
 
         if not pth_ok:
             print("[ERROR] Both download strategies failed.")
