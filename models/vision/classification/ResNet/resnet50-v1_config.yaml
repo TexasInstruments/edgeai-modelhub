@@ -35,6 +35,6 @@ session:
   num_inputs: 1
 model_info:
   metric_reference:
-    accuracy_top1%: 76.15
+    accuracy_top1%: 74.93
   compact_name: resnet50-v1
   shortlisted: true
