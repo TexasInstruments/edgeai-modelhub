@@ -137,6 +137,6 @@ metric:
     79: 90
 model_info:
   metric_reference:
-    accuracy_ap[.5:.95]%: 60.0
+    accuracy_ap[.5:.95]%: 48.6
   compact_name: yolo26s
   shortlisted: true
