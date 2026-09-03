@@ -7,77 +7,63 @@ datasets:
 - COCO
 ---
 
+<div align="center">
+
 # YOLO26 for TI EdgeAI
 
-[![License](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://opensource.org/licenses/AGPL-3.0)
-[![Framework](https://img.shields.io/badge/Framework-ONNX-orange.svg)](https://onnx.ai/)
-[![Task](https://img.shields.io/badge/Task-Object%20Detection-green.svg)](https://github.com/TexasInstruments/edgeai)
+### Native End-to-End Object Detector for Real-Time Edge Deployment
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Model Details](#model-details)
-- [Setup & Installation](#setup--installation)
-- [Usage](#usage)
-- [Citation](#citation)
-- [Additional Resources](#additional-resources)
+[![License](https://img.shields.io/badge/License-AGPL%203.0-blue?style=for-the-badge)](https://opensource.org/licenses/AGPL-3.0)
+[![Framework](https://img.shields.io/badge/Framework-ONNX-orange?style=for-the-badge)](https://onnx.ai/)
+[![Task](https://img.shields.io/badge/Task-Object%20Detection-green?style=for-the-badge)](https://github.com/TexasInstruments/edgeai)
+[![Dataset](https://img.shields.io/badge/Dataset-COCO-blueviolet?style=for-the-badge)](https://cocodataset.org/)
 
-## Introduction
-
-🚀 **Ready-to-deploy image detection for TI edge devices**
-
-This YOLO26 model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
-
-### Learn More About TI EdgeAI Platform
-
-- 📖 **[EdgeAI SDK Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md)** - Complete SDK guide, installation, and system setup
-- 🔧 **[EdgeAI MPU Overview](https://github.com/TexasInstruments/edgeai/tree/main/edgeai-mpu)** - Architecture details, performance benchmarks, and development resources
-- 🌐 **[TI EdgeAI Ecosystem](https://github.com/TexasInstruments/edgeai)** - Explore the full EdgeAI toolkit and model zoo
+</div>
 
 ---
 
-## Model Details
+## Overview
 
+**YOLO26** is the newest generation of the Ultralytics YOLO family, released in January 2026. Its detection head is natively end-to-end: by default it predicts final boxes directly, without a separate non-maximum suppression (NMS) post-processing step, which simplifies deployment and reduces post-processing latency. The head also removes Distribution Focal Loss (DFL) from box regression, lowering head complexity while keeping an unconstrained regression range.
 
-| Dataset | Model Name | Model ID   | Input Size | mAP[.5:.95]% | Available | Notes |
-|---------|------------|------------|------------|--------------|-----------|-------|
-| COCO    | yolo26n    | `od-mh8015` | 640×640    | 40.9         | ✅        |       |
-| COCO    | yolo26s    | `od-mh8016` | 640×640    | 48.6         | ✅        |       |
-| COCO    | yolo26m    | `od-mh8017` | 640×640    | 53.1         | ✅        |       |
-| COCO    | yolo26l    | `od-mh8018` | 640×640    | 55.0         | ✅        |       |
-| COCO    | yolo26x    | `od-mh8019` | 640×640    | 57.5         | ✅        |       |
+The training recipe pairs these architectural changes with **MuSGD** (a hybrid Muon + SGD optimizer), **Progressive Loss** (which shifts supervision emphasis toward the inference-time head), and **STAL**, a Small-Target-Aware Label Assignment scheme that preserves positive label coverage for small objects. Together these updates improve the accuracy/latency trade-off over YOLO11 across all five model scales and give YOLO26n notably faster CPU ONNX inference, making the family well suited to power- and latency-constrained edge deployments.
+
+These ONNX models cover the five COCO-pretrained detection scales (n/s/m/l/x, 80 classes), exported and shape-fixed to a static `640×640` input for TIDL compilation on TI edge SoCs.
+
+> See [YOLO11](../YOLO11/) for the previous-generation, NMS-based YOLO models.
+
 ---
 
-## Setup & Installation
+## Model Variants
 
-### Requirements
+| Model | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+|-------|-----------|--------------|--------------------|--------|
+| `yolo26n` | 640×640 | 40.9 | TDA4VH | [yolo26n_model_config.yaml](yolo26n_model_config.yaml) |
+| `yolo26s` | 640×640 | 48.6 | TDA4VH | [yolo26s_model_config.yaml](yolo26s_model_config.yaml) |
+| `yolo26m` | 640×640 | 53.1 | TDA4VH | [yolo26m_model_config.yaml](yolo26m_model_config.yaml) |
+| `yolo26l` | 640×640 | 55.0 | TDA4VH | [yolo26l_model_config.yaml](yolo26l_model_config.yaml) |
+| `yolo26x` | 640×640 | 57.5 | TDA4VH | [yolo26x_model_config.yaml](yolo26x_model_config.yaml) |
+
+**Recommended for edge deployment:** `yolo26n` (best accuracy/compute trade-off)
+
+---
+
+## Quick Start
+
+### Prerequisites
+
 ```bash
-# Python dependencies
-pip install onnx>=1.22.0
-pip install onnxruntime>=1.23.2
+pip install onnx>=1.22.0 onnxruntime>=1.23.2
 ```
-#### For TI hardware deployment
-Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)**
 
-## Usage
-
-### Download from HuggingFace
-If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+### Export the Model
 
 ```bash
-hf download <REPO_ID> --local-dir <download_location>
-```
+# Prepare the default model (yolo26n)
+python prepare_model.py
 
-### Model Download
-The model can be downloaded automatically using the provided scripts.
-Each variant has a corresponding `.link` file and can be prepared with `prepare_model.py`:
-
-```bash
-# Prepare a specific variant using --model flag
-python prepare_model.py --model yolo26n
+# Prepare a specific model variant
 python prepare_model.py --model yolo26s
-python prepare_model.py --model yolo26m
-python prepare_model.py --model yolo26l
-python prepare_model.py --model yolo26x
 
 # Prepare multiple variants in one run
 python prepare_model.py --model yolo26n yolo26s yolo26m
@@ -88,58 +74,109 @@ python prepare_model.py --model all
 # List all supported variants and their local download/conversion status
 python prepare_model.py --list-models
 
-# Or specify the .link file directly
-python prepare_model.py --link-file yolo26n.onnx.link
-python prepare_model.py --link-file yolo26s.onnx.link
-python prepare_model.py --link-file yolo26m.onnx.link
-python prepare_model.py --link-file yolo26l.onnx.link
-python prepare_model.py --link-file yolo26x.onnx.link
+# Re-run shape fixing on an already-downloaded ONNX
+python prepare_model.py --model yolo26n --skip-download
 ```
 
-The `.link` file contains the HuggingFace model URL and will automatically:
-1. Download the model if not present locally
-2. Fix dynamic shapes to static shapes for hardware deployment
-3. Validate the model structure
+The script automatically:
+- Parses the variant's `.link` file to get the HuggingFace download URL
+- Downloads the model with `curl` if it isn't already present locally
+- Fixes dynamic input dimensions to a static shape (default `[1, 3, 640, 640]`)
+- Runs ONNX shape inference and optional `onnx-simplifier` optimization
+- Validates the resulting ONNX model structure
 
-### Using the model on TI device
+### Compile and Infer uing TIDL Runner
 
-#### Option 1: Advanced Users (TIDL Tools)
-For users familiar with TIDL and requiring fine-grained control:
+**Compile using TIDL Runner - on PC**
 
 ```bash
-# Use edgeai-tidl-tools for compilation and inference
-git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
-cd edgeai-tidl-tools
+tidlrunner-cli compile --target_device J784S4 \
+  --config_path yolo26n_model_config.yaml
 ```
 
-Refer to the [tidl-tools setup](https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/README.md#getting-started) page for more details on compile and infer.
-
-**Learn more:** [edgeai-tidl-tools documentation](https://github.com/TexasInstruments/edgeai-tidl-tools)
-
-#### Option 2: Simplified Workflow (Recommended)
-For easy compilation, benchmarking, and accuracy evaluation:
-
-setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
+**Run Inference Benchmark - on device**
 
 ```bash
-# Compile model and evaluate performance on J784S4.
-
-# Compile model
-tidlrunner-cli compile --target_device J784S4 --config_path yolo26n_model_config.yaml
-
-# Evaluate accuracy
-tidlrunner-cli evaluate --target_device J784S4 --config_path yolo26n_model_config.yaml
+tidlrunner-cli infer --target_device J784S4 \
+  --config_path yolo26n_model_config.yaml
 ```
 
-**Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)
+### Compile and Infer using TIDL Tools (Advanced):
 
-## Additional Resources
+Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
 
-### Tools & Frameworks
-- [EdgeAI TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools) - Low-level compilation and inference
-- [EdgeAI TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) - High-level wrapper for easy deployment
-- [EdgeAI Main Repository](https://github.com/TexasInstruments/edgeai) - Complete EdgeAI ecosystem
+---
 
-**License:** agpl-3.0
+## Citation
+
+If you use these models, please cite:
+
+```bibtex
+@article{jocher2026yolo26,
+  title={Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models},
+  author={Jocher, Glenn and Qiu, Jing and Liu, Mengyu and Lyu, Shuai and
+          Akyon, Fatih Cagatay and Kalfaoglu, Muhammet Esat},
+  journal={arXiv preprint arXiv:2606.03748},
+  year={2026}
+}
+```
+
+---
+
+## 🔗 Resources
+
+| Resource | Link |
+|----------|------|
+| **Paper** | [arXiv:2606.03748](https://arxiv.org/abs/2606.03748) |
+| **Source Code** | [ultralytics/ultralytics](https://github.com/ultralytics/ultralytics) |
+| **Model Docs** | [YOLO26 Documentation](https://docs.ultralytics.com/models/yolo26/) |
+| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
+| **EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |
+
+---
+
+## Related Models
+
+<table>
+<tr>
+<td align="center">
+
+**YOLO11**
+Predecessor generation
+NMS-based detection
+
+</td>
+<td align="center">
+
+**YOLOv8**
+Earlier YOLO generation
+Widely adopted baseline
+
+</td>
+<td align="center">
+
+**YOLOX**
+Anchor-free detector
+Decoupled head design
+
+</td>
+<td align="center">
+
+**RT-DETRv2**
+Transformer-based detector
+Real-time DETR variant
+
+</td>
+</tr>
+</table>
+
+---
+
+<div align="center">
+
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** June 2026
+**Last Updated:** August 2026
+
+</div>

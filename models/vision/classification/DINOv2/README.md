@@ -13,7 +13,7 @@ datasets:
 
 # DINOv2 for TI EdgeAI
 
-### Self-Supervised Vision Transformer for Image Classification
+### Self-Supervised Vision Transformer Backbone for Image Classification
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 [![Framework](https://img.shields.io/badge/Framework-ONNX-orange?style=for-the-badge)](https://onnx.ai/)
@@ -26,126 +26,87 @@ datasets:
 
 ## Overview
 
-**DINOv2** (Self-**Di**stillation with **No** Labels v2) produces high-performance visual features using a purely self-supervised training regime on 142M images — no labels required. The pretrained backbones are paired with a lightweight linear classification head for ImageNet-1K inference.
+**DINOv2** (Self-**Di**stillation with **No** Labels v2) is a self-supervised Vision Transformer pre-training method from Meta AI. It produces high-performance visual features using a purely self-supervised training regime on 142M images — no labels required during pre-training. The pretrained backbones are paired with a lightweight linear classification head for ImageNet-1K inference, outputting 1000-class logits.
 
-All models use a **ViT/14** patch size (14×14 patches) and are evaluated at **224×224** input resolution.
+All models use a **ViT/14** patch size (14x14 patches) and are evaluated at **224x224** input resolution. Some variants add **register tokens** ([arXiv:2309.16588](https://arxiv.org/abs/2309.16588)) — extra learnable tokens that absorb the attention artifacts otherwise seen in patch-token feature maps, giving slightly better accuracy with the same backbone size.
+
+> See [DINO](../DINO/) for the original first-generation models.
 
 ---
 
 ## Model Variants
 
-| Model ID | Variant | Params | GFLOPs | Top-1 Acc | Edge Use |
-|----------|---------|--------|--------|-----------|----------|
-| `cl-mh6010` | ViT-S/14 distilled | 21M | 4.6 | **81.1%** | Recommended |
-| `cl-mh6011` | ViT-B/14 distilled | 86M | 17.6 | **84.5%** | Feasible |
-| `cl-mh6012` | ViT-L/14 distilled | 307M | 61.6 | **86.3%** | Not supported (TIDL) |
-| `cl-mh6013` | ViT-S/14 distilled + registers | 21M | 4.6 | **80.9%** | Recommended |
-| `cl-mh6014` | ViT-B/14 distilled + registers | 86M | 17.6 | **84.6%** | Feasible |
-| `cl-mh6015` | ViT-L/14 distilled + registers | 307M | 61.6 | **86.7%** | Not supported (TIDL) |
+| Model | Architecture | Params | GFLOPs | Top-1 Acc | Validated Devices | Config |
+|-------|-------------|--------|--------|-----------|----------|--------|
+| `dinov2_vits14_lc` | ViT-S/14 distilled | 21M | 4.6 | 81.1% | TDA4VH | [dinov2_vits14_lc_config.yaml](dinov2_vits14_lc_config.yaml) |
+| `dinov2_vits14_reg_lc` | ViT-S/14 distilled + registers | 21M | 4.6 | 80.9% | TDA4VH | [dinov2_vits14_reg_lc_config.yaml](dinov2_vits14_reg_lc_config.yaml) |
+| `dinov2_vitb14_lc` | ViT-B/14 distilled | 86M | 17.6 | 84.5% | TDA4VH | [dinov2_vitb14_lc_config.yaml](dinov2_vitb14_lc_config.yaml) |
+| `dinov2_vitb14_reg_lc` | ViT-B/14 distilled + registers | 86M | 17.6 | 84.6% | TDA4VH | [dinov2_vitb14_reg_lc_config.yaml](dinov2_vitb14_reg_lc_config.yaml) |
 
-> **With registers**: Vision Transformers with register tokens ([arXiv:2309.16588](https://arxiv.org/abs/2309.16588)) exhibit fewer artifacts in feature maps and slightly better accuracy on dense prediction tasks. For pure classification, both variants perform comparably.
+**Recommended for edge deployment:** `dinov2_vits14_lc` (best accuracy/compute trade-off)
+
+> **Note:** ViT-L/14 and ViT-g/14 variants (`dinov2_vitl14_lc`, `dinov2_vitg14_lc`, and their `_reg_lc` counterparts) are excluded from this repo — they require ~16 GB+ RAM to export and are not suitable for edge (TIDL) deployment.
 
 ---
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 ```bash
-pip install torch torchvision onnx>=1.22.0 onnxruntime>=1.23.2
-# Optional but recommended for model optimization:
-pip install onnx-simplifier
+pip install torch torchvision onnx>=1.22.0 onnxruntime>=1.23.2 onnx-simplifier
 ```
 
-### 2. Export Model to ONNX
+### Export the Model
 
 ```bash
-# Export recommended model (ViT-S/14, ~82MB)
-python prepare_model.py --model dinov2_vits14_lc
+# Export the default model (ViT-S/14 distilled)
+python prepare_model.py
 
-# Export ViT-B/14 (~348MB)
+# Export a specific model variant
 python prepare_model.py --model dinov2_vitb14_lc
 
-# Export ViT-S/14 with registers
+# Export the registers variant
 python prepare_model.py --model dinov2_vits14_reg_lc
 
-# Export ViT-B/14 with registers
-python prepare_model.py --model dinov2_vitb14_reg_lc
-
-# Export all edge-supported models
+# Export all edge-suitable models
 python prepare_model.py --model all
+
+# Re-run shape fixing on an already-exported ONNX
+python prepare_model.py --model dinov2_vits14_lc --skip-export
 ```
 
-> **Note:** ViT-L/14 variants (`dinov2_vitl14_lc`, `dinov2_vitl14_reg_lc`) are excluded from edge deployment due to TIDL compilation failures and are not exported by `--model all`.
-
 The script automatically:
-- Downloads pretrained weights from PyTorch Hub (facebookresearch/dinov2)
-- Exports backbone + linear classification head to ONNX (opset 17)
-- Fixes dynamic shapes to static `[1, 3, 224, 224]`
-- Validates and optionally simplifies the model graph
+- Loads the pretrained backbone + linear classification head from PyTorch Hub (`facebookresearch/dinov2`)
+- Exports to ONNX (opset 17) with a dynamic batch axis
+- Fixes input shapes to `[1, 3, 224, 224]` and propagates shapes via ONNX shape inference
+- Runs onnx-simplifier (`onnxsim`) and validates the final model with `onnx.checker`
 
-### 3. Compile for TI Hardware
+### Compile and Infer uing TIDL Runner
 
-**Using TIDL Runner (Recommended):**
+**Compile using TIDL Runner - on PC**
 
 ```bash
 tidlrunner-cli compile --target_device J784S4 \
   --config_path dinov2_vits14_lc_config.yaml
 ```
 
-**Using TIDL Tools (Advanced):**
+**Run Inference Benchmark - on device**
 
 ```bash
-git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
-cd edgeai-tidl-tools
-# Follow setup at https://github.com/TexasInstruments/edgeai-tidl-tools
-```
-
-### 4. Evaluate Performance
-
-```bash
-tidlrunner-cli evaluate --target_device J784S4 \
+tidlrunner-cli infer --target_device J784S4 \
   --config_path dinov2_vits14_lc_config.yaml
 ```
 
----
+### Compile and Infer using TIDL Tools (Advanced):
 
-## Preprocessing
-
-All DINOv2 variants use standard ImageNet normalization:
-
-| Parameter | Value |
-|-----------|-------|
-| Resize | 256 (short side) |
-| Crop | 224×224 (center) |
-| Layout | NCHW |
-| Mean (BGR) | `[123.675, 116.28, 103.53]` |
-| Scale | `[0.017125, 0.017507, 0.017429]` |
-| Channels | RGB (reverse_channels: false) |
+Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
 
 ---
 
-## Hardware Deployment
+## Citation
 
-- **Primary Target:** TI J784S4 MPU
-- **Framework:** TIDL Compilation Tools
-- **Deployment:** [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)
-
----
-
-## Use Cases
-
-| Application | Details |
-|-------------|---------|
-| **Industrial** | Product classification, quality inspection |
-| **Surveillance** | Scene understanding, object categorization |
-| **Robotics** | Visual perception, environment understanding |
-| **Agriculture** | Crop monitoring, disease detection |
-| **Medical Imaging** | Feature extraction for downstream classifiers |
-
----
-
-## Citations
+If you use these models, please cite:
 
 ```bibtex
 @misc{oquab2023dinov2,
@@ -165,34 +126,60 @@ All DINOv2 variants use standard ImageNet normalization:
 
 ---
 
-## Resources
+## 🔗 Resources
 
 | Resource | Link |
 |----------|------|
 | **Paper** | [arXiv:2304.07193](https://arxiv.org/abs/2304.07193) |
 | **Registers Paper** | [arXiv:2309.16588](https://arxiv.org/abs/2309.16588) |
-| **Source Repo** | [facebookresearch/dinov2](https://github.com/facebookresearch/dinov2) |
+| **Source Code** | [facebookresearch/dinov2](https://github.com/facebookresearch/dinov2) |
 | **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
 | **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
+| **DINO** | [Predecessor model](../DINO/) |
 
 ---
 
 ## Related Models
 
-| Model | Task | Notes |
-|-------|------|-------|
-| ResNet-50 | Classification | Lightweight CNN baseline |
-| CLIP | Classification + Text | Vision-language model |
+<table>
+<tr>
+<td align="center">
+
+**DINO**
+Predecessor
+First-generation self-supervised ViT
+
+</td>
+<td align="center">
+
+**ViT**
+Alternative backbone
+Supervised transformer
+
+</td>
+<td align="center">
+
+**ResNet**
+CNN backbone
+Lower compute
+
+</td>
+<td align="center">
+
+**ConvNeXt**
+Modern CNN
+Transformer-inspired design
+
+</td>
+</tr>
+</table>
 
 ---
 
 <div align="center">
 
-**License:** Apache 2.0  
 **Maintained by:** Texas Instruments EdgeAI Team  
 **Last Updated:** August 2026
-
-[Back to Model Hub](../../README.md)
 
 </div>

@@ -7,145 +7,112 @@ datasets:
 - COCO
 ---
 
+<div align="center">
+
 # YOLOX for TI EdgeAI
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Framework](https://img.shields.io/badge/Framework-ONNX-orange.svg)](https://onnx.ai/)
-[![Task](https://img.shields.io/badge/Task-Object%20Detection-green.svg)](https://github.com/TexasInstruments/edgeai)
+### Anchor-Free YOLO with a Decoupled Head
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Model Details](#model-details)
-- [Setup & Installation](#setup--installation)
-- [Usage](#usage)
-- [Citation](#citation)
-- [Additional Resources](#additional-resources)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
+[![Framework](https://img.shields.io/badge/Framework-ONNX-orange?style=for-the-badge)](https://onnx.ai/)
+[![Task](https://img.shields.io/badge/Task-Object%20Detection-green?style=for-the-badge)](https://github.com/TexasInstruments/edgeai)
+[![Dataset](https://img.shields.io/badge/Dataset-COCO-blueviolet?style=for-the-badge)](https://cocodataset.org/)
 
-## Introduction
-
-🚀 **Ready-to-deploy image detection for TI edge devices**
-
-This YOLOX model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
-
-YOLOX is an anchor-free version of YOLO with decoupled head design, providing strong performance with simpler architecture. It offers excellent accuracy-speed trade-offs across different model sizes.
-
-### Learn More About TI EdgeAI Platform
-
-- 📖 **[EdgeAI SDK Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md)** - Complete SDK guide, installation, and system setup
-- 🔧 **[EdgeAI MPU Overview](https://github.com/TexasInstruments/edgeai/tree/main/edgeai-mpu)** - Architecture details, performance benchmarks, and development resources
-- 🌐 **[TI EdgeAI Ecosystem](https://github.com/TexasInstruments/edgeai)** - Explore the full EdgeAI toolkit and model zoo
+</div>
 
 ---
 
-## Model Details
+## Overview
+
+**YOLOX** is an anchor-free member of the YOLO family developed by Megvii, designed to close the gap between research and industrial object detection. Unlike earlier YOLO versions, YOLOX removes predefined anchor boxes and instead predicts objects directly, which simplifies the design and reduces the number of heuristic tuning parameters (e.g., anchor sizes) needed for a new dataset.
+
+Two architectural changes distinguish YOLOX from anchor-based YOLO detectors: a **decoupled head** that separates classification and localization into independent branches (improving convergence and accuracy over the coupled head used in YOLOv3/v4/v5), and **SimOTA**, an advanced label-assignment strategy that formulates matching between predictions and ground-truth boxes as an optimal-transport problem to pick better positive samples during training.
+
+This model is optimized for deployment on **Texas Instruments edge devices**, providing production-ready object detection for industrial automation, smart cameras, robotics, and IoT vision applications. It offers a range of variants — from the lightweight `yolox-nano` to the high-accuracy `yolox-x` — covering a wide accuracy/compute trade-off space.
 
 ---
-|Dataset |Model Name      |Model ID    |Input Size |mAP[.5:.95]% |Available |Notes                  |
-|-       |-               |-           |-          |-            |-         |-                      |
-|COCO    |yolox-nano      |`od-mh8009` |416×416    |24.8         | ✅       |Recommended, Smallest  |
-|COCO    |yolox-tiny      |`od-mh8010` |416×416    |32.8         | ✅       |                       |
-|COCO    |yolox-m         |`od-mh8011` |640×640    |46.9         | ✅       |                       |
-|COCO    |yolox-l         |`od-mh8012` |640×640    |49.7         | ✅       |                       |
-|COCO    |yolox-x         |`od-mh8013` |640×640    |51.2         | ✅       |Largest                |
-|COCO    |yolox-darknet53 |`od-mh8014` |640×640    |47.4         | ✅       |Darknet53 backbone     |
+
+## Model Variants
+
+| Model | Model ID | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+|-------|----------|------------|--------------|--------------------|--------|
+| `yolox_nano` | `od-mh8009` | 416×416 | 24.8 | TDA4VH | [yolox_nano_config.yaml](yolox_nano_config.yaml) |
+| `yolox_tiny` | `od-mh8010` | 416×416 | 32.8 | TDA4VH | [yolox_tiny_config.yaml](yolox_tiny_config.yaml) |
+| `yolox_s` | - | 640×640 | - | - | N/A |
+| `yolox_m` | `od-mh8011` | 640×640 | 46.9 | TDA4VH | [yolox_m_config.yaml](yolox_m_config.yaml) |
+| `yolox_l` | `od-mh8012` | 640×640 | 49.7 | TDA4VH | [yolox_l_config.yaml](yolox_l_config.yaml) |
+| `yolox_x` | `od-mh8013` | 640×640 | 51.2 | TDA4VH | [yolox_x_config.yaml](yolox_x_config.yaml) |
+| `yolox_darknet53` | `od-mh8014` | 640×640 | 47.4 | TDA4VH | [yolox_darknet53_config.yaml](yolox_darknet53_config.yaml) |
+
+**Recommended for edge deployment:** `yolox_nano` (smallest, best accuracy/compute trade-off)
+
+> `yolox_s` currently ships only as an ONNX export (`yolox_s.onnx`) with no TIDL config YAML available in this folder.
+
 ---
 
-## Setup & Installation
+## Quick Start
 
-### Requirements
+### Prerequisites
+
 ```bash
-# Python dependencies
 pip install onnx>=1.22.0
 pip install onnxruntime>=1.23.2
 pip install onnxsim  # For model simplification
 ```
-#### For TI hardware deployment
-Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)**
 
-## Usage
-
-### Download from HuggingFace
-If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+### Export the Model
 
 ```bash
-hf download <REPO_ID> --local-dir <download_location>
-```
-
-### Model Download
-The models can be downloaded and prepared using the provided script.
-
-Each variant has corresponding `.link` files and can be downloaded with `prepare_model.py`:
-
-```bash
-# Download specific variants
+# Prepare a specific variant (downloads pre-built ONNX, or falls back to
+# downloading the .pth checkpoint and converting it locally)
 python prepare_model.py --model yolox_nano
-python prepare_model.py --model yolox_tiny
-python prepare_model.py --model yolox_m
-python prepare_model.py --model yolox_l
-python prepare_model.py --model yolox_x
-python prepare_model.py --model yolox_darknet53
 
-# Download multiple variants at once
+# Prepare multiple variants at once
 python prepare_model.py --model yolox_nano yolox_tiny yolox_m
 
-# Download with ONNX simplification (recommended)
-python prepare_model.py --model yolox_nano --simplify
+# Prepare every supported variant
+python prepare_model.py --model all
 
-# Download and verify accuracy on COCO val2017
+# Force re-download even if the ONNX/PTH file already exists locally
+python prepare_model.py --model yolox_nano --force-download
+
+# Prepare and verify accuracy on COCO val2017
 python prepare_model.py --model yolox_nano --verify --num-val-images 500
+
+# List all supported variants and their local download status
+python prepare_model.py --list-models
 ```
 
-The script will automatically:
-1. Download pre-built ONNX from GitHub releases (or convert from PyTorch if needed)
-2. Fix batch dimensions to static shapes for hardware deployment
-3. Optionally simplify the model using onnx-simplifier
-4. Optionally verify accuracy on COCO val2017 dataset
+The script automatically:
+- Reads the source URL from each variant's `.onnx.link` file and downloads the pre-built ONNX from GitHub releases
+- Falls back to downloading the PyTorch checkpoint from the `.pth.link` file and converting it to ONNX locally (via the official YOLOX `yolox.exp.get_exp` API) if the pre-built ONNX is unavailable
+- Runs ONNX shape inference and hard-codes the batch dimension to 1
+- Optionally simplifies the model using `onnx-simplifier`
+- Optionally verifies accuracy on COCO val2017 using `pycocotools`, reporting mAP@[0.50:0.95] and mAP@0.50
 
-### Using the model on TI device
+Supported `--model` values: `yolox_nano`, `yolox_tiny`, `yolox_s`, `yolox_m`, `yolox_l`, `yolox_x`, `yolox_darknet53`, or `all`.
 
-#### Option 1: Advanced Users (TIDL Tools)
-For users familiar with TIDL and requiring fine-grained control:
+### Compile and Infer uing TIDL Runner
+
+**Compile using TIDL Runner - on PC**
 
 ```bash
-# Use edgeai-tidl-tools for compilation and inference
-git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
-cd edgeai-tidl-tools
+tidlrunner-cli compile --target_device J784S4 \
+  --config_path yolox_nano_config.yaml
 ```
 
-Refer to the [tidl-tools setup](https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/README.md#getting-started) page for more details on compile and infer.
-
-**Learn more:** [edgeai-tidl-tools documentation](https://github.com/TexasInstruments/edgeai-tidl-tools)
-
-#### Option 2: Simplified Workflow (Recommended)
-For easy compilation, benchmarking, and accuracy evaluation:
-
-setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
+**Run Inference Benchmark - on device**
 
 ```bash
-# Compile model and evaluate performance on J784S4.
-
-# yolox-nano (416×416)
-tidlrunner-cli compile --target_device J784S4 --config_path yolox_nano_config.yaml
-
-# yolox-tiny (416×416)
-tidlrunner-cli compile --target_device J784S4 --config_path yolox_tiny_config.yaml
-
-# yolox-m (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path yolox_m_config.yaml
-
-# yolox-l (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path yolox_l_config.yaml
-
-# yolox-x (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path yolox_x_config.yaml
-
-# yolox-darknet53 (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path yolox_darknet53_config.yaml
+tidlrunner-cli infer --target_device J784S4 \
+  --config_path yolox_nano_config.yaml
 ```
 
-To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
+### Compile and Infer using TIDL Tools (Advanced):
 
-**Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)
+Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+---
 
 ## Citation
 
@@ -160,17 +127,61 @@ If you use YOLOX in your research, please cite:
 }
 ```
 
-## Additional Resources
+---
 
-### Tools & Frameworks
-- [EdgeAI TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools) - Low-level compilation and inference
-- [EdgeAI TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) - High-level wrapper for easy deployment
-- [EdgeAI Main Repository](https://github.com/TexasInstruments/edgeai) - Complete EdgeAI ecosystem
+## 🔗 Resources
 
-### YOLOX Resources
-- [YOLOX Official Repository](https://github.com/Megvii-BaseDetection/YOLOX) - Original implementation by Megvii
-- [YOLOX Paper](https://arxiv.org/abs/2107.08430) - arXiv paper with architecture details
+| Resource | Link |
+|----------|------|
+| **Paper** | [arXiv:2107.08430](https://arxiv.org/abs/2107.08430) |
+| **Source Code** | [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) |
+| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
+| **EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |
 
-**License:** apache-2.0  
+---
+
+## Related Models
+
+<table>
+<tr>
+<td align="center">
+
+**RTMDet**
+Real-time single-stage detector
+Distillation-enhanced backbone
+
+</td>
+<td align="center">
+
+**YOLOv8**
+Anchor-free single-stage detector
+Improved training pipeline
+
+</td>
+<td align="center">
+
+**YOLO11**
+Latest Ultralytics YOLO
+Refined efficiency/accuracy
+
+</td>
+<td align="center">
+
+**RT-DETRv2**
+Real-time DETR-based detector
+Transformer decoder head
+
+</td>
+</tr>
+</table>
+
+---
+
+<div align="center">
+
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** July 2026
+**Last Updated:** August 2026
+
+</div>

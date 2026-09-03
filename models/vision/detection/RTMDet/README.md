@@ -7,142 +7,99 @@ datasets:
 - COCO
 ---
 
+<div align="center">
+
 # RTMDet for TI EdgeAI
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Framework](https://img.shields.io/badge/Framework-ONNX-orange.svg)](https://onnx.ai/)
-[![Task](https://img.shields.io/badge/Task-Object%20Detection-green.svg)](https://github.com/TexasInstruments/edgeai)
+### Real-Time Object Detector with a CSPNeXt Backbone
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Model Details](#model-details)
-- [Setup & Installation](#setup--installation)
-- [Usage](#usage)
-- [Citation](#citation)
-- [Additional Resources](#additional-resources)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
+[![Framework](https://img.shields.io/badge/Framework-ONNX-orange?style=for-the-badge)](https://onnx.ai/)
+[![Task](https://img.shields.io/badge/Task-Object%20Detection-green?style=for-the-badge)](https://github.com/TexasInstruments/edgeai)
+[![Dataset](https://img.shields.io/badge/Dataset-COCO-blueviolet?style=for-the-badge)](https://cocodataset.org/)
 
-## Introduction
-
-🚀 **Ready-to-deploy image detection for TI edge devices**
-
-This RTMDet model is specifically optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready image detection with minimal setup.
-
-RTMDet is a high-performance real-time object detector from OpenMMLab with a CSPNeXt backbone and an efficient anchor-free detection head. It achieves excellent accuracy-speed trade-offs across five model sizes (tiny, s, m, l, x), making it suitable for a wide range of deployment scenarios from resource-constrained edge devices to high-throughput server deployments.
-
-### Learn More About TI EdgeAI Platform
-
-- 📖 **[EdgeAI SDK Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md)** - Complete SDK guide, installation, and system setup
-- 🔧 **[EdgeAI MPU Overview](https://github.com/TexasInstruments/edgeai/tree/main/edgeai-mpu)** - Architecture details, performance benchmarks, and development resources
-- 🌐 **[TI EdgeAI Ecosystem](https://github.com/TexasInstruments/edgeai)** - Explore the full EdgeAI toolkit and model zoo
+</div>
 
 ---
 
-## Model Details
+## Overview
+
+**RTMDet** is a high-performance real-time object detector from OpenMMLab with a CSPNeXt backbone and an efficient anchor-free detection head. It achieves excellent accuracy-speed trade-offs across five model sizes (tiny, s, m, l, x), making it suitable for a wide range of deployment scenarios from resource-constrained edge devices to high-throughput server deployments.
+
+This RTMDet model is optimized for **Texas Instruments MPU (Microprocessor Unit) devices**, enabling high-performance computer vision applications at the edge. Whether you're building industrial automation systems, smart cameras, robotics, or IoT vision solutions, this model provides production-ready object detection with minimal setup.
 
 ---
-| Dataset | Model Name   | Model ID     | Input Size | mAP[.5:.95]% | Available | Notes              |
-| -       | -            | -            | -          | -            | -         | -                  |
-| COCO    | rtmdet-tiny  | `od-mh8020`  | 640×640    | 40.9         | ✅        | Recommended, Smallest |
-| COCO    | rtmdet-s     | `od-mh8021`  | 640×640    | 44.5         | ✅        |                    |
-| COCO    | rtmdet-m     | `od-mh8022`  | 640×640    | 49.3         | ✅        |                    |
-| COCO    | rtmdet-l     | `od-mh8023`  | 640×640    | 51.4         | ✅        |                    |
-| COCO    | rtmdet-x     | `od-mh8024`  | 640×640    | 52.8         | ✅        | Largest            |
+
+## Model Variants
+
+| Model | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+|-------|-----------|--------------|--------------------|--------|
+| `rtmdet_tiny` | 640x640 | 40.9 | TDA4VH | [rtmdet_tiny_config.yaml](rtmdet_tiny_config.yaml) |
+| `rtmdet_s` | 640x640 | 44.5 | TDA4VH | [rtmdet_s_config.yaml](rtmdet_s_config.yaml) |
+| `rtmdet_m` | 640x640 | 49.3 | TDA4VH | [rtmdet_m_config.yaml](rtmdet_m_config.yaml) |
+| `rtmdet_l` | 640x640 | 51.4 | TDA4VH | [rtmdet_l_config.yaml](rtmdet_l_config.yaml) |
+| `rtmdet_x` | 640x640 | 52.8 | TDA4VH | [rtmdet_x_config.yaml](rtmdet_x_config.yaml) |
+
+**Recommended for edge deployment:** `rtmdet_tiny` (smallest, best accuracy/compute trade-off)
+
 ---
 
-## Setup & Installation
+## Quick Start
 
-### Requirements
+### Prerequisites
+
 ```bash
-# Python dependencies
 pip install onnx>=1.22.0
 pip install onnxruntime>=1.23.2
 pip install onnxsim  # For model simplification
 ```
-#### For TI hardware deployment
-Refer the link for **[tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)**
 
-## Usage
-
-### Download from HuggingFace
-If you are accessing this from HuggingFace, clone the repository using the `hf` CLI:
+### Export the Model
 
 ```bash
-hf download <REPO_ID> --local-dir <download_location>
-```
-
-### Model Download
-The models can be downloaded and converted to ONNX using the provided script.
-
-Each variant has a corresponding `.link` file and can be downloaded with `prepare_model.py`:
-
-```bash
-# Download specific variants
-python prepare_model.py --models tiny
-python prepare_model.py --models s
-python prepare_model.py --models m
-python prepare_model.py --models l
-python prepare_model.py --models x
-
-# Download multiple variants at once
-python prepare_model.py --models tiny s m
-
-# Download all variants
+# Export all variants (default)
 python prepare_model.py
 
-# Download with ONNX simplification (recommended)
-python prepare_model.py --models tiny --simplify
+# Export specific variants
+python prepare_model.py --models tiny
+python prepare_model.py --models tiny s m
+
+# Export without ONNX simplification
+python prepare_model.py --models tiny --no-simplify
+
+# Force regeneration of .link files
+python prepare_model.py --generate-links
 ```
 
-The script will automatically:
-1. Install all required dependencies
-2. Download the PyTorch checkpoint from OpenMMLab
-3. Download the model configuration files
-4. Convert to ONNX format
-5. Fix batch dimensions to static shapes for hardware deployment
-6. Optionally simplify the model using onnx-simplifier
+The script automatically:
+- Installs `mmcv-lite` and `mmdet` (and other required dependencies)
+- Downloads the PyTorch checkpoint referenced by each variant's `.onnx.link` file from OpenMMLab
+- Downloads the matching mmdetection config files (pinned to tag `v3.3.0`)
+- Builds the model with `mmdet.apis.init_detector` and wraps it to emit decoded `boxes` (xyxy) and per-class sigmoid `scores` (NMS is left for on-device post-processing)
+- Exports to ONNX (opset 13), fixes the batch dimension to 1, and re-runs shape inference
+- Optionally simplifies the model using `onnx-simplifier`
 
-### Using the model on TI device
+### Compile and Infer uing TIDL Runner
 
-#### Option 1: Advanced Users (TIDL Tools)
-For users familiar with TIDL and requiring fine-grained control:
+**Compile using TIDL Runner - on PC**
 
 ```bash
-# Use edgeai-tidl-tools for compilation and inference
-git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
-cd edgeai-tidl-tools
+tidlrunner-cli compile --target_device J784S4 \
+  --config_path rtmdet_tiny_config.yaml
 ```
 
-Refer to the [tidl-tools setup](https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/README.md#getting-started) page for more details on compile and infer.
-
-**Learn more:** [edgeai-tidl-tools documentation](https://github.com/TexasInstruments/edgeai-tidl-tools)
-
-#### Option 2: Simplified Workflow (Recommended)
-For easy compilation, benchmarking, and accuracy evaluation:
-
-setup tidl runner using this link [edgeai-tidlrunner setup](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/tidlrunner/docs/setup.md)
+**Run Inference Benchmark - on device**
 
 ```bash
-# Compile model and evaluate performance on J784S4.
-
-# rtmdet-tiny (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_tiny_config.yaml
-
-# rtmdet-s (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_s_config.yaml
-
-# rtmdet-m (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_m_config.yaml
-
-# rtmdet-l (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_l_config.yaml
-
-# rtmdet-x (640×640)
-tidlrunner-cli compile --target_device J784S4 --config_path rtmdet_x_config.yaml
+tidlrunner-cli infer --target_device J784S4 \
+  --config_path rtmdet_tiny_config.yaml
 ```
 
-To evaluate accuracy, replace `compile` with `evaluate` in the commands above.
+### Compile and Infer using TIDL Tools (Advanced):
 
-**Learn more:** [edgeai-tidlrunner documentation](https://github.com/TexasInstruments/edgeai-tidlrunner)
+Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+---
 
 ## Citation
 
@@ -157,17 +114,61 @@ If you use RTMDet in your research, please cite:
 }
 ```
 
-## Additional Resources
+---
 
-### Tools & Frameworks
-- [EdgeAI TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools) - Low-level compilation and inference
-- [EdgeAI TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) - High-level wrapper for easy deployment
-- [EdgeAI Main Repository](https://github.com/TexasInstruments/edgeai) - Complete EdgeAI ecosystem
+## 🔗 Resources
 
-### RTMDet Resources
-- [RTMDet Official Repository](https://github.com/open-mmlab/mmdetection/tree/main/configs/rtmdet) - OpenMMLab implementation
-- [RTMDet Paper](https://arxiv.org/abs/2212.07784) - arXiv paper with architecture details
+| Resource | Link |
+|----------|------|
+| **Paper** | [arXiv:2212.07784](https://arxiv.org/abs/2212.07784) |
+| **Source Code** | [open-mmlab/mmdetection (rtmdet configs)](https://github.com/open-mmlab/mmdetection/tree/main/configs/rtmdet) |
+| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
+| **EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |
 
-**License:** apache-2.0  
+---
+
+## Related Models
+
+<table>
+<tr>
+<td align="center">
+
+**YOLOX**
+Anchor-free CNN detector
+Similar single-stage design
+
+</td>
+<td align="center">
+
+**YOLOv8**
+CNN-based real-time detector
+Comparable accuracy/speed range
+
+</td>
+<td align="center">
+
+**YOLO11**
+Latest Ultralytics YOLO
+Improved efficiency
+
+</td>
+<td align="center">
+
+**RT-DETRv2**
+Real-time transformer detector
+NMS-free alternative
+
+</td>
+</tr>
+</table>
+
+---
+
+<div align="center">
+
 **Maintained by:** Texas Instruments EdgeAI Team  
-**Last Updated:** July 2026
+**Last Updated:** August 2026
+
+</div>

@@ -27,28 +27,28 @@ datasets:
 
 **ConvNeXt** is a pure convolutional network modernized by incorporating design principles from Vision Transformers (Swin Transformer). Introduced in [*A ConvNet for the 2020s*](https://arxiv.org/abs/2201.03545) (Liu et al., CVPR 2022), ConvNeXt matches or surpasses Swin Transformers in accuracy while retaining the simplicity, efficiency, and hardware-friendliness of standard CNNs — no attention mechanisms, no positional encodings.
 
-Pretrained weights are sourced from **torchvision** (BSD-3-Clause), trained on ImageNet-1K using a modernized recipe.
+Pretrained weights are sourced from **torchvision** (BSD-3-Clause), trained on ImageNet-1K using a modernized training recipe.
+
+All variants take a **224×224** input with ImageNet normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]). The ideal pre-crop resize is variant-specific (236px for Tiny, 230px for Small, 232px for Base/Large) and is already set correctly in each variant's config YAML.
 
 ---
 
 ## Model Variants
 
-| Variant | Backbone | Params | GFLOPs | Top-1 Acc | Top-5 Acc | Edge Use |
-|---|---|---|---|---|---|---|
-| `convnext_tiny`  | ConvNeXt-Tiny  | 28.6M  |  4.46 | **82.52%** | 96.15% | Recommended |
-| `convnext_small` | ConvNeXt-Small | 50.2M  |  8.68 | **83.62%** | 96.65% | Feasible |
-| `convnext_base`  | ConvNeXt-Base  | 88.6M  | 15.36 | **84.06%** | 96.87% | Feasible |
-| `convnext_large` | ConvNeXt-Large | 197.8M | 34.36 | **84.41%** | 96.98% | Feasible |
+| Model | Architecture | Params | GFLOPs | Top-1 Acc | Top-5 Acc | Validated Devices | Config |
+|-------|-------------|--------|--------|-----------|-----------|--------------------|--------|
+| `convnext_tiny`  | ConvNeXt-Tiny  | 28.6M  |  4.46 | **82.52%** | 96.15% | TDA4VH | [convnext_tiny_config.yaml](convnext_tiny_config.yaml) |
+| `convnext_small` | ConvNeXt-Small | 50.2M  |  8.68 | **83.62%** | 96.65% | TDA4VH | [convnext_small_config.yaml](convnext_small_config.yaml) |
+| `convnext_base`  | ConvNeXt-Base  | 88.6M  | 15.36 | **84.06%** | 96.87% | TDA4VH | [convnext_base_config.yaml](convnext_base_config.yaml) |
+| `convnext_large` | ConvNeXt-Large | 197.8M | 34.36 | **84.41%** | 96.98% | TDA4VH | [convnext_large_config.yaml](convnext_large_config.yaml) |
 
-> **Recommended:** `convnext_tiny` delivers competitive accuracy (82.5%) at the lowest compute (4.46 GFLOPs, 28.6M params), making it the most practical choice for edge deployment. Larger variants offer incremental accuracy gains at significantly higher compute cost.
-
-All variants use a **224×224** input resolution with ImageNet normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]).
+**Recommended for edge deployment:** `convnext_tiny` delivers competitive accuracy (82.5%) at the lowest compute (4.46 GFLOPs, 28.6M params), making it the most practical choice for edge deployment. Larger variants offer incremental accuracy gains at significantly higher compute cost.
 
 ---
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 ```bash
 pip install torch torchvision onnx>=1.22.0 onnxruntime>=1.23.2
@@ -56,16 +56,16 @@ pip install torch torchvision onnx>=1.22.0 onnxruntime>=1.23.2
 pip install onnx-simplifier
 ```
 
-### 2. Export Model to ONNX
+### Export the Model
 
 ```bash
-# Export recommended model (convnext_tiny, ~109 MB)
-python prepare_model.py --model convnext_tiny
+# Export the default model (convnext_tiny)
+python prepare_model.py
 
-# Export a heavier variant
+# Export a specific model variant
 python prepare_model.py --model convnext_base
 
-# Export all variants
+# Export all supported models
 python prepare_model.py --model all
 
 # List all available variants
@@ -77,60 +77,29 @@ python prepare_model.py --model convnext_tiny --weights /path/to/checkpoint.pth
 
 The script automatically:
 - Downloads pretrained ImageNet-1K weights from torchvision (first run only)
-- Exports the model to ONNX (opset 17) with static shape `[1, 3, 224, 224]`
+- Exports the model to ONNX (opset 17) with static input shape [1, 3, 224, 224]
 - Runs ONNX shape inference
-- Optionally simplifies the graph with onnxsim
+- Optionally simplifies the graph with onnx-simplifier
 
-### 3. Compile for TI Hardware
+### Compile and Infer uing TIDL Runner
 
-**Using TIDL Runner (Recommended):**
+**Compile using TIDL Runner - on PC**
 
 ```bash
 tidlrunner-cli compile --target_device J784S4 \
   --config_path convnext_tiny_config.yaml
 ```
 
-**Using TIDL Tools (Advanced):**
+**Run Inference Benchmark - on device**
 
 ```bash
-git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
-cd edgeai-tidl-tools
-# Follow setup at https://github.com/TexasInstruments/edgeai-tidl-tools
-```
-
-### 4. Evaluate Performance
-
-```bash
-tidlrunner-cli evaluate --target_device J784S4 \
+tidlrunner-cli infer --target_device J784S4 \
   --config_path convnext_tiny_config.yaml
 ```
 
----
+### Compile and Infer using TIDL Tools (Advanced):
 
-## Hardware Deployment
-
-- **Primary Target:** TI J784S4 MPU
-- **Framework:** TIDL Compilation Tools
-- **Deployment:** [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)
-
----
-
-## Preprocessing Details
-
-| Step | Value |
-|---|---|
-| Resize | Variant-specific (see below) |
-| Center Crop | 224×224 |
-| Normalization mean | [0.485, 0.456, 0.406] |
-| Normalization std | [0.229, 0.224, 0.225] |
-| Data layout | NCHW |
-
-| Variant | Resize (before crop) |
-|---|---|
-| `convnext_tiny` | 236 |
-| `convnext_small` | 230 |
-| `convnext_base` | 232 |
-| `convnext_large` | 232 |
+Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
 
 ---
 
@@ -150,10 +119,10 @@ tidlrunner-cli evaluate --target_device J784S4 \
 
 ---
 
-## Resources
+## 🔗 Resources
 
 | Resource | Link |
-|---|---|
+|----------|------|
 | **Paper** | [arXiv:2201.03545](https://arxiv.org/abs/2201.03545) |
 | **Source Repo** | [facebookresearch/ConvNeXt](https://github.com/facebookresearch/ConvNeXt) |
 | **Torchvision Docs** | [ConvNeXt](https://docs.pytorch.org/vision/main/models/convnext.html) |
@@ -166,21 +135,44 @@ tidlrunner-cli evaluate --target_device J784S4 \
 
 ## Related Models
 
-| Model | Task | Notes |
-|---|---|---|
-| ViT | Classification | Pure Transformer, attention-based |
-| DINOv2 | Classification | Self-supervised ViT, higher accuracy |
-| DINO | Classification | Self-supervised ViT with linear head |
-| ResNet | Classification | CNN baseline, lower compute |
+<table>
+<tr>
+<td align="center">
+
+**ViT**
+Pure Transformer
+Attention-based
+
+</td>
+<td align="center">
+
+**DINOv2**
+Self-supervised ViT
+Higher accuracy
+
+</td>
+<td align="center">
+
+**DINO**
+Self-supervised ViT
+Linear head
+
+</td>
+<td align="center">
+
+**ResNet**
+CNN baseline
+Lower compute
+
+</td>
+</tr>
+</table>
 
 ---
 
 <div align="center">
 
-**License:** BSD-3-Clause  
 **Maintained by:** Texas Instruments EdgeAI Team  
 **Last Updated:** August 2026
-
-[Back to Model Hub](../../README.md)
 
 </div>

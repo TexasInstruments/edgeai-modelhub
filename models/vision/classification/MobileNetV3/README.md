@@ -34,17 +34,20 @@ Both variants are evaluated at **224×224** input resolution on **ImageNet-1K** 
 
 ## Model Variants
 
-| Model ID | Variant | Params | GFLOPs | Top-1 Acc | Top-5 Acc |
-|----------|---------|--------|--------|-----------|-----------|
-| `cl-mh6025` | MobileNetV3-Large | 5.48M | 0.22 | **75.274%** | 92.566% |
+| Model | Architecture | Params | GFLOPs | Top-1 Acc | Top-5 Acc | Validated Devices | Config |
+|-------|---------------|--------|--------|-----------|-----------|--------------------|--------|
+| `mobilenetv3_large` | MobileNetV3-Large | 5.48M | 0.22 | **75.274%** | 92.566% | TDA4VH | [mobilenetv3_large_config.yaml](mobilenetv3_large_config.yaml) |
+| `mobilenetv3_small` | MobileNetV3-Small | 2.54M | 0.06 | 67.668% | 87.402% | N/A | N/A |
 
-Uses `IMAGENET1K_V2` weights (improved training recipe).
+`mobilenetv3_large` uses `IMAGENET1K_V2` weights (improved training recipe). `mobilenetv3_small` is excluded from `prepare_model.py`'s export catalog because it produces poor accuracy under TIDL compilation — the `mobilenetv3_small.onnx` bundled in this folder is provided for reference only and has no validated TIDL config.
+
+**Recommended for edge deployment:** `mobilenetv3_large` (best accuracy/compute trade-off with a validated TIDL config)
 
 ---
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 ```bash
 pip install torch torchvision onnx>=1.14.0 onnxruntime>=1.16.0
@@ -52,84 +55,55 @@ pip install torch torchvision onnx>=1.14.0 onnxruntime>=1.16.0
 pip install onnx-simplifier
 ```
 
-### 2. Export Model to ONNX
+### Export the Model
 
 ```bash
-# Export MobileNetV3-Large (~21 MB)
+# Export the default model (MobileNetV3-Large)
+python prepare_model.py
+
+# Export a specific model variant
 python prepare_model.py --model mobilenetv3_large
+
+# Export with a custom input resolution
+python prepare_model.py --model mobilenetv3_large --shape 224 224
 
 # List all available variants
 python prepare_model.py --list-models
 ```
 
 The script automatically:
-- Downloads pretrained ImageNet-1K weights from torchvision
-- Exports to ONNX (opset 17) with static `[1, 3, 224, 224]` input shape
+- Downloads pretrained ImageNet-1K weights from torchvision (`MobileNet_V3_Large_Weights.IMAGENET1K_V2`)
+- Exports to ONNX (opset 17) with a static `[1, 3, 224, 224]` input shape
 - Runs ONNX shape inference across all intermediate tensors
 - Optionally simplifies the graph with onnxsim (use `--no-simplify` to skip)
 
-### 3. Compile for TI Hardware
+> Note: `mobilenetv3_small` is currently excluded from the export catalog (poor accuracy under TIDL compilation), so `--model mobilenetv3_small` and `--model all` only produce `mobilenetv3_large`.
 
-**Using TIDL Runner (Recommended):**
+### Compile and Infer uing TIDL Runner
+
+**Compile using TIDL Runner - on PC**
 
 ```bash
 tidlrunner-cli compile --target_device J784S4 \
   --config_path mobilenetv3_large_config.yaml
 ```
 
-**Using TIDL Tools (Advanced):**
+**Run Inference Benchmark - on device**
 
 ```bash
-git clone https://github.com/TexasInstruments/edgeai-tidl-tools.git
-cd edgeai-tidl-tools
-# Follow setup at https://github.com/TexasInstruments/edgeai-tidl-tools
-```
-
-### 4. Evaluate Performance
-
-```bash
-tidlrunner-cli evaluate --target_device J784S4 \
+tidlrunner-cli infer --target_device J784S4 \
   --config_path mobilenetv3_large_config.yaml
 ```
 
----
+### Compile and Infer using TIDL Tools (Advanced):
 
-## Preprocessing
-
-MobileNetV3-Large uses standard ImageNet normalization:
-
-| Parameter | Value |
-|-----------|-------|
-| Resize | 256 (short side) |
-| Crop | 224×224 (center) |
-| Layout | NCHW |
-| Mean (BGR) | `[123.675, 116.28, 103.53]` |
-| Scale | `[0.017125, 0.017507, 0.017429]` |
-| Channels | RGB (reverse_channels: false) |
-
----
-
-## Hardware Deployment
-
-- **Primary Target:** TI J784S4 MPU
-- **Framework:** TIDL Compilation Tools
-- **Deployment:** [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner/blob/main/README.md)
-
----
-
-## Use Cases
-
-| Application | Details |
-|-------------|---------|
-| **Mobile / Embedded** | On-device classification with tight latency and power budgets |
-| **Industrial** | Product inspection, defect detection, sorting |
-| **Surveillance** | Scene classification, object categorization |
-| **Robotics** | Fast visual perception for navigation and manipulation |
-| **IoT** | Always-on classification in resource-constrained sensors |
+Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
 
 ---
 
 ## Citation
+
+If you use these models, please cite:
 
 ```bibtex
 @inproceedings{Howard2019MobileNetV3,
@@ -144,7 +118,7 @@ MobileNetV3-Large uses standard ImageNet normalization:
 
 ---
 
-## Resources
+## 🔗 Resources
 
 | Resource | Link |
 |----------|------|
@@ -159,20 +133,44 @@ MobileNetV3-Large uses standard ImageNet normalization:
 
 ## Related Models
 
-| Model | Task | Notes |
-|-------|------|-------|
-| ResNet-50 | Classification | Deeper CNN, higher accuracy |
-| DINOv2 | Classification | ViT-based, self-supervised features |
-| DINO | Classification | ViT-based self-supervised baseline |
+<table>
+<tr>
+<td align="center">
+
+**ResNet**
+Deeper CNN
+Higher accuracy
+
+</td>
+<td align="center">
+
+**ConvNeXt**
+Modern CNN
+ViT-inspired design
+
+</td>
+<td align="center">
+
+**ViT**
+Vision Transformer
+Attention-based
+
+</td>
+<td align="center">
+
+**DINOv2**
+Self-supervised
+Rich feature embeddings
+
+</td>
+</tr>
+</table>
 
 ---
 
 <div align="center">
 
-**License:** BSD-3-Clause  
 **Maintained by:** Texas Instruments EdgeAI Team  
 **Last Updated:** August 2026
-
-[Back to Model Hub](../../README.md)
 
 </div>
