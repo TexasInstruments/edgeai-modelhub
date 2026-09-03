@@ -97,7 +97,7 @@
   <!-- Hero -->
   <div class="hero" style="background:#c41230; color:white; border-radius:12px; padding:2.5rem 2rem; text-align:center; margin-bottom:2rem;">
     <div style="margin-bottom:1rem;">
-      <img src="docs/assets/TXN-Logo.png" alt="Texas Instruments" style="width:56px; height:56px; object-fit:contain; background:white; border-radius:8px; padding:6px;" />
+      <img src="docs/assets/TXN-Logo.png" alt="Texas Instruments" width=56 style="width:56px; height:56px; object-fit:contain; background:white; border-radius:8px; padding:6px;" />
     </div>
     <h1 style="font-size:2rem; font-weight:700; letter-spacing:-0.5px; color:white;">EdgeAI Model Hub</h1>
     <p style="margin-top:0.5rem; font-size:1.05rem; opacity:0.9; color:white;">Pre-trained, hardware-optimized AI models for TI edge devices</p>
@@ -137,12 +137,7 @@
   <!-- License Summary -->
   <div class="card" id="licenses">
     <h2>License Summary</h2>
-    <p>Models in this hub are distributed under the following open-source licenses:</p>
-    <div class="lic-row">
-      <a href="https://www.apache.org/licenses/LICENSE-2.0" class="lic lic-apache" target="_blank">Apache 2.0</a>
-      <a href="https://www.gnu.org/licenses/agpl-3.0.html" class="lic lic-agpl" target="_blank">AGPL 3.0</a>
-      <a href="https://opensource.org/licenses/BSD-3-Clause" class="lic lic-bsd" target="_blank">BSD-3-Clause</a>
-    </div>
+    <p>Models in this hub are distributed under various open-source licenses - each model's license is indicated in it's own documentation page.</p>
     <div class="disclaimer">
       <strong>Disclaimer:</strong> Certain licenses in this repository impose distribution restrictions that
       may affect commercial, proprietary, or regulated-industry use. It is the sole responsibility of the
@@ -185,9 +180,8 @@ python prepare_model.py --model &lt;variant&gt;</code></pre>
   <div class="card">
     <h2>Supported Hardware</h2>
     <p>
-      Compatible TI MPU device families compiled and validated via TIDL. See the
-      <a href="https://github.com/TexasInstruments/edgeai" class="underline">TI EdgeAI repository</a>
-      for the full device support matrix.
+      Compatible TI MPU device families compiled and validated via TIDL. See the supported devices, SDKs and version compatibility at 
+      <a href="https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md" class="underline"> EdgeAI developer landing space </a> and <a href="https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/docs/sdk_version_compatibility_table.md" class="underline">edgeai-tidl-tools sdk version compatibility matrix </a>
     </p>
     <div class="hw-list">
       <div class="hw-item"><strong>AM62A</strong></div>
@@ -201,11 +195,11 @@ python prepare_model.py --model &lt;variant&gt;</code></pre>
       </div>
       <div class="hw-item">
         <strong>J721S2</strong>
-        <span class="hw-aliases">TDA4VL <span class="hw-sep">·</span> AM68A</span>
+        <span class="hw-aliases">TDA4VL <span class="hw-sep"> </span> TDA4AL <span class="hw-sep">·</span> AM68A</span>
       </div>
       <div class="hw-item">
         <strong>J784S4</strong>
-        <span class="hw-aliases">TDA4VH <span class="hw-sep">·</span> AM69A</span>
+        <span class="hw-aliases">TDA4VH <span class="hw-sep"> </span> TDA4AL <span class="hw-sep"> </span> AM69A </span>
       </div>
     </div>
   </div>
@@ -401,9 +395,9 @@ python prepare_model.py --model &lt;variant&gt;</code></pre>
   <div class="footer">
     <p>Maintained by Texas Instruments EdgeAI Team &nbsp;|&nbsp; Last Updated August 2026</p>
     <p style="margin-top:0.4rem;">
-      <a href="https://github.com/TexasInstruments/edgeai">Contact</a>
       <a href="https://github.com/TexasInstruments/edgeai/issues">Issues</a>
       <a href="https://github.com/TexasInstruments/edgeai/discussions">Discussions</a>
+      <a href="mailto:edgeai-dev@list.ti.com">Contact</a>
     </p>
   </div>
 
