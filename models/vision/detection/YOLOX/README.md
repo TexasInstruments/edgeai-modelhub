@@ -94,18 +94,22 @@ Supported `--model` values: `yolox_nano`, `yolox_tiny`, `yolox_s`, `yolox_m`, `y
 
 ### Compile and Infer uing TIDL Runner
 
+> **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
+
 **Compile using TIDL Runner - on PC**
 
 ```bash
+cd /path/to/tidlrunner
 tidlrunner-cli compile --target_device J784S4 \
-  --config_path yolox_nano_config.yaml
+  --config_path /path/to/yolox_nano_config.yaml
 ```
 
 **Run Inference Benchmark - on device**
 
 ```bash
+cd /path/to/tidlrunner
 tidlrunner-cli infer --target_device J784S4 \
-  --config_path yolox_nano_config.yaml
+  --config_path /path/to/yolox_nano_config.yaml
 ```
 
 ### Compile and Infer using TIDL Tools (Advanced):

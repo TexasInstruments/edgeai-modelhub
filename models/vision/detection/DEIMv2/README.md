@@ -163,18 +163,22 @@ def postprocess(pred_boxes, pred_logits, image_h, image_w, threshold=CONFIDENCE_
 
 ### Compile and Infer uing TIDL Runner
 
+> **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
+
 **Compile using TIDL Runner - on PC**
 
 ```bash
+cd /path/to/tidlrunner
 tidlrunner-cli compile --target_device J784S4 \
-  --config_path deimv2_s_config.yaml
+  --config_path /path/to/deimv2_s_config.yaml
 ```
 
 **Run Inference Benchmark - on device**
 
 ```bash
+cd /path/to/tidlrunner
 tidlrunner-cli infer --target_device J784S4 \
-  --config_path deimv2_s_config.yaml
+  --config_path /path/to/deimv2_s_config.yaml
 ```
 
 > Replace `deimv2_s_config.yaml` with `deimv2_m_config.yaml` to compile/infer the `deimv2_m` variant. To evaluate accuracy instead of just compiling, replace `compile` with `evaluate`.

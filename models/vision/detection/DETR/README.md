@@ -89,18 +89,22 @@ The script automatically:
 
 ### Compile and Infer uing TIDL Runner
 
+> **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
+
 **Compile using TIDL Runner - on PC**
 
 ```bash
+cd /path/to/tidlrunner
 tidlrunner-cli compile --target_device J784S4 \
-  --config_path detr_resnet50_config.yaml
+  --config_path /path/to/detr_resnet50_config.yaml
 ```
 
 **Run Inference Benchmark - on device**
 
 ```bash
+cd /path/to/tidlrunner
 tidlrunner-cli infer --target_device J784S4 \
-  --config_path detr_resnet50_config.yaml
+  --config_path /path/to/detr_resnet50_config.yaml
 ```
 
 Swap `detr_resnet50_config.yaml` for `detr_resnet50_dc5_config.yaml`, `detr_resnet101_config.yaml`, or `detr_resnet101_dc5_config.yaml` to compile/infer the other variants.
