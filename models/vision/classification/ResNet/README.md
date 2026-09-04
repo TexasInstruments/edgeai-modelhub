@@ -42,8 +42,8 @@ The two variants differ only in where the stride-2 downsampling is placed inside
 
 | Model | Architecture | Params | Top-1 Accuracy | Validated Devices | Config |
 |-------|--------------|--------|-----------------|--------------------|--------|
-| `resNet50` | ResNet-50 v1.5 (stride-2 in 3×3 conv) | ~25.6M | 76.15% | TDA4VH | [resnet50_config.yaml](resnet50_config.yaml) |
-| `resnet50-v1` | ResNet-50 v1, original (stride-2 in 1×1 conv) | ~25.6M | 74.93% | TDA4VH | [resnet50-v1_config.yaml](resnet50-v1_config.yaml) |
+| `resNet50` | ResNet-50 v1.5 (stride-2 in 3×3 conv) | ~25.6M | 76.15% | TDA4VH, TDA4VL, TDA4AEN | [resnet50_config.yaml](resnet50_config.yaml) |
+| `resnet50-v1` | ResNet-50 v1, original (stride-2 in 1×1 conv) | ~25.6M | 74.93% | TDA4VH, TDA4VL, TDA4AEN | [resnet50-v1_config.yaml](resnet50-v1_config.yaml) |
 
 **Recommended for edge deployment:** `resNet50` (v1.5) — highest accuracy with the same compute cost (4.1 GigaMACs) as the original v1.
 

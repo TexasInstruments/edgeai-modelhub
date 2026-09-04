@@ -36,11 +36,11 @@ YOLO11 is offered in five size variants — n, s, m, l, x — spanning a wide ac
 
 | Model | Params (M) | Input Size | mAP[.5:.95]% | Validated Devices | Config |
 |-------|------------|------------|--------------|--------------------|--------|
-| `yolo11n` | 2.6 | 640×640 | 39.5 | TDA4VH | [yolo11n_model_config.yaml](yolo11n_model_config.yaml) |
-| `yolo11s` | 9.4 | 640×640 | 47.0 | TDA4VH | [yolo11s_model_config.yaml](yolo11s_model_config.yaml) |
-| `yolo11m` | 20.1 | 640×640 | 51.5 | TDA4VH | [yolo11m_model_config.yaml](yolo11m_model_config.yaml) |
-| `yolo11l` | 25.3 | 640×640 | 53.4 | TDA4VH | [yolo11l_model_config.yaml](yolo11l_model_config.yaml) |
-| `yolo11x` | 56.9 | 640×640 | 54.7 | TDA4VH | [yolo11x_model_config.yaml](yolo11x_model_config.yaml) |
+| `yolo11n` | 2.6 | 640×640 | 39.5 | TDA4VH, TDA4VL | [yolo11n_model_config.yaml](yolo11n_model_config.yaml) |
+| `yolo11s` | 9.4 | 640×640 | 47.0 | TDA4VH, TDA4VL | [yolo11s_model_config.yaml](yolo11s_model_config.yaml) |
+| `yolo11m` | 20.1 | 640×640 | 51.5 | TDA4VH, TDA4VL | [yolo11m_model_config.yaml](yolo11m_model_config.yaml) |
+| `yolo11l` | 25.3 | 640×640 | 53.4 | TDA4VH, TDA4VL | [yolo11l_model_config.yaml](yolo11l_model_config.yaml) |
+| `yolo11x` | 56.9 | 640×640 | 54.7 | TDA4VH, TDA4VL | [yolo11x_model_config.yaml](yolo11x_model_config.yaml) |
 
 **Recommended for edge deployment:** `yolo11n` (best accuracy/compute trade-off, smallest footprint)
 

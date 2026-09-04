@@ -34,9 +34,9 @@ YOLOv8 is offered in five size variants — n, s, m, l, x — spanning a wide ac
 
 | Model | Params (M) | Input Size | mAP[.5:.95]% | Validated Devices | Config |
 |-------|------------|------------|--------------|--------------------|--------|
-| `yolov8n` | 3.2 | 640×640 | 37.3 | TDA4VH | [yolov8n_config.yaml](yolov8n_config.yaml) |
+| `yolov8n` | 3.2 | 640×640 | 37.3 | TDA4VH, TDA4VL, TDA4AEN | [yolov8n_config.yaml](yolov8n_config.yaml) |
 | `yolov8s` | 11.2 | 640×640 | 44.9 | N/A | N/A |
-| `yolov8m` | 25.9 | 640×640 | 50.2 | TDA4VH | [yolov8m_config.yaml](yolov8m_config.yaml) |
+| `yolov8m` | 25.9 | 640×640 | 50.2 | TDA4VH, TDA4VL | [yolov8m_config.yaml](yolov8m_config.yaml) |
 | `yolov8l` | 43.7 | 640×640 | 52.9 | N/A | N/A |
 | `yolov8x` | 68.2 | 640×640 | 53.9 | N/A | N/A |
 

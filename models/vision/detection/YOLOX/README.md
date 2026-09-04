@@ -36,13 +36,13 @@ This model is optimized for deployment on **Texas Instruments edge devices**, pr
 
 | Model | Model ID | Input Size | mAP[.5:.95]% | Validated Devices | Config |
 |-------|----------|------------|--------------|--------------------|--------|
-| `yolox_nano` | `od-mh8009` | 416×416 | 24.8 | TDA4VH | [yolox_nano_config.yaml](yolox_nano_config.yaml) |
-| `yolox_tiny` | `od-mh8010` | 416×416 | 32.8 | TDA4VH | [yolox_tiny_config.yaml](yolox_tiny_config.yaml) |
+| `yolox_nano` | `od-mh8009` | 416×416 | 24.8 | TDA4VH, TDA4VL | [yolox_nano_config.yaml](yolox_nano_config.yaml) |
+| `yolox_tiny` | `od-mh8010` | 416×416 | 32.8 | TDA4VH, TDA4VL | [yolox_tiny_config.yaml](yolox_tiny_config.yaml) |
 | `yolox_s` | - | 640×640 | - | - | N/A |
-| `yolox_m` | `od-mh8011` | 640×640 | 46.9 | TDA4VH | [yolox_m_config.yaml](yolox_m_config.yaml) |
-| `yolox_l` | `od-mh8012` | 640×640 | 49.7 | TDA4VH | [yolox_l_config.yaml](yolox_l_config.yaml) |
-| `yolox_x` | `od-mh8013` | 640×640 | 51.2 | TDA4VH | [yolox_x_config.yaml](yolox_x_config.yaml) |
-| `yolox_darknet53` | `od-mh8014` | 640×640 | 47.4 | TDA4VH | [yolox_darknet53_config.yaml](yolox_darknet53_config.yaml) |
+| `yolox_m` | `od-mh8011` | 640×640 | 46.9 | TDA4VH, TDA4VL | [yolox_m_config.yaml](yolox_m_config.yaml) |
+| `yolox_l` | `od-mh8012` | 640×640 | 49.7 | TDA4VH, TDA4VL | [yolox_l_config.yaml](yolox_l_config.yaml) |
+| `yolox_x` | `od-mh8013` | 640×640 | 51.2 | TDA4VH, TDA4VL | [yolox_x_config.yaml](yolox_x_config.yaml) |
+| `yolox_darknet53` | `od-mh8014` | 640×640 | 47.4 | TDA4VH, TDA4VL | [yolox_darknet53_config.yaml](yolox_darknet53_config.yaml) |
 
 **Recommended for edge deployment:** `yolox_nano` (smallest, best accuracy/compute trade-off)
 

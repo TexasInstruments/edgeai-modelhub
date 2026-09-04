@@ -38,11 +38,11 @@ These ONNX models cover the five COCO-pretrained detection scales (n/s/m/l/x, 80
 
 | Model | Input Size | mAP[.5:.95]% | Validated Devices | Config |
 |-------|-----------|--------------|--------------------|--------|
-| `yolo26n` | 640×640 | 40.9 | TDA4VH | [yolo26n_model_config.yaml](yolo26n_model_config.yaml) |
-| `yolo26s` | 640×640 | 48.6 | TDA4VH | [yolo26s_model_config.yaml](yolo26s_model_config.yaml) |
-| `yolo26m` | 640×640 | 53.1 | TDA4VH | [yolo26m_model_config.yaml](yolo26m_model_config.yaml) |
-| `yolo26l` | 640×640 | 55.0 | TDA4VH | [yolo26l_model_config.yaml](yolo26l_model_config.yaml) |
-| `yolo26x` | 640×640 | 57.5 | TDA4VH | [yolo26x_model_config.yaml](yolo26x_model_config.yaml) |
+| `yolo26n` | 640×640 | 40.9 | TDA4VH, TDA4VL | [yolo26n_model_config.yaml](yolo26n_model_config.yaml) |
+| `yolo26s` | 640×640 | 48.6 | TDA4VH, TDA4VL | [yolo26s_model_config.yaml](yolo26s_model_config.yaml) |
+| `yolo26m` | 640×640 | 53.1 | TDA4VH, TDA4VL | [yolo26m_model_config.yaml](yolo26m_model_config.yaml) |
+| `yolo26l` | 640×640 | 55.0 | TDA4VH, TDA4VL | [yolo26l_model_config.yaml](yolo26l_model_config.yaml) |
+| `yolo26x` | 640×640 | 57.5 | TDA4VH, TDA4VL | [yolo26x_model_config.yaml](yolo26x_model_config.yaml) |
 
 **Recommended for edge deployment:** `yolo26n` (best accuracy/compute trade-off)
 
