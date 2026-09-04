@@ -97,7 +97,7 @@
   <!-- Hero -->
   <div class="hero" style="background:#c41230; color:white; border-radius:12px; padding:2.5rem 2rem; text-align:center; margin-bottom:2rem;">
     <div style="margin-bottom:1rem;">
-      <img src="docs/assets/TXN-Logo.png" alt="Texas Instruments" width=56 style="width:56px; height:56px; object-fit:contain; background:white; border-radius:8px; padding:6px;" />
+      <img src="docs/assets/TXN-Logo.png" alt="Texas Instruments" width="56" height="56" style="width:56px; height:56px; object-fit:contain; background:white; border-radius:8px; padding:6px;" />
     </div>
     <h1 style="font-size:2rem; font-weight:700; letter-spacing:-0.5px; color:white;">EdgeAI Model Hub</h1>
     <p style="margin-top:0.5rem; font-size:1.05rem; opacity:0.9; color:white;">Pre-trained, hardware-optimized AI models for TI edge devices</p>
@@ -170,10 +170,12 @@
 cd edgeai-modelhub</code></pre>
     <p><strong>2. Navigate to a model directory and prepare the model</strong></p><pre><code>cd models/vision/&lt;task&gt;/&lt;model&gt;/
 python prepare_model.py --model &lt;variant&gt;</code></pre>
-    <p><strong>3. Compile for TI hardware</strong></p><pre><code>tidlrunner-cli compile --target_device &lt;device&gt; \
-  --config_path &lt;model&gt;_config.yaml</code></pre>
-  <p><strong>4. Infer on TI hardware</strong></p><pre><code>tidlrunner-cli infer --target_device &lt;device&gt; \
-  --config_path &lt;model&gt;_config.yaml</code></pre>
+    <p><strong>3. Compile for TI hardware (run from inside the egdeai-tidlrunner directory)</strong></p><pre><code>cd /path/to/egdeai-tidlrunner
+tidlrunner-cli compile --target_device &lt;device&gt; \
+  --config_path /path/to/egdeai-modelhub/&lt;model&gt;_config.yaml</code></pre>
+  <p><strong>4. Infer on TI hardware (run from inside the egdeai-tidlrunner directory)</strong></p><pre><code>cd /path/to/egdeai-tidlrunner
+tidlrunner-cli infer --target_device &lt;device&gt; \
+  --config_path /path/to/egdeai-modelhub/&lt;model&gt;_config.yaml</code></pre>
   </div>
 
   <!-- Supported Hardware -->

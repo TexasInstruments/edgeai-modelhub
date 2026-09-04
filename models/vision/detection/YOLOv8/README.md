@@ -94,7 +94,7 @@ The script automatically:
 **Compile using TIDL Runner - on PC**
 
 ```bash
-cd /path/to/tidlrunner
+cd /path/to/edgeai-tidlrunner
 tidlrunner-cli compile --target_device J784S4 \
   --config_path /path/to/yolov8n_config.yaml
 ```
@@ -102,7 +102,7 @@ tidlrunner-cli compile --target_device J784S4 \
 **Run Inference Benchmark - on device**
 
 ```bash
-cd /path/to/tidlrunner
+cd /path/to/edgeai-tidlrunner
 tidlrunner-cli infer --target_device J784S4 \
   --config_path /path/to/yolov8n_config.yaml
 ```
