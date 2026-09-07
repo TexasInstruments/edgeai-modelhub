@@ -109,9 +109,9 @@
     <p>
       The TI EdgeAI Model Hub is a curated repository of open-source computer vision models
       optimized for deployment on Texas Instruments MPU devices. Models are compiled for TI hardware
-      using <a href="https://github.com/TexasInstruments/edgeai-tidlrunner" class="underline">TIDL Runner</a>
-      or <a href="https://github.com/TexasInstruments/edgeai-tidl-tools" class="underline">TIDL Tools</a>,
-      enabling production-ready inference without cloud dependency.
+      using <a href="https://github.com/TexasInstruments/edgeai-tidl-tools" class="underline">TIDL Tools</a>
+      or <a href="https://github.com/TexasInstruments/edgeai-tidlrunner" class="underline">TIDL Runner</a>,
+      enabling production-ready inference without cloud dependency. For more details on TIDL Model compilation options, Runtimes and Operators supported etc, see the <a href="https://github.com/TexasInstruments/edgeai-tidl-tools#user-guide" class="underline">TIDL User Guide</a>
     </p>
     <ul class="feature-list">
       <li>Hardware-optimized for TI MPU processors</li>
@@ -186,24 +186,36 @@ tidlrunner-cli infer --target_device &lt;device&gt; \
       <a href="https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md" class="underline"> EdgeAI developer landing space </a> and <a href="https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/docs/sdk_version_compatibility_table.md" class="underline">edgeai-tidl-tools sdk version compatibility matrix </a>
     </p>
     <div class="hw-list">
-      <div class="hw-item"><strong>AM62A</strong></div>
+      <strong>
       <div class="hw-item">
-        <strong>J722S</strong>
-        <span class="hw-aliases">TDA4AEN <span class="hw-sep">·</span> AM67A</span>
+        AM62A<span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/AM62A3">AM62A3</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/AM62A7">AM62A7</a><span class="hw-sep"> </span>
       </div>
       <div class="hw-item">
-        <strong>J721E</strong>
-        <span class="hw-aliases">TDA4VM</span>
+        J722S<span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4AEN-Q1">TDA4AEN</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/AM67A">AM67A</a><span class="hw-sep"> </span>
       </div>
       <div class="hw-item">
-        <strong>J721S2</strong>
-        <span class="hw-aliases">TDA4VL <span class="hw-sep"> </span> TDA4AL <span class="hw-sep">·</span> AM68A</span>
+        J721E<span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4VM">TDA4VM</a><span class="hw-sep"> </span>
       </div>
       <div class="hw-item">
-        <strong>J784S4</strong>
-        <span class="hw-aliases">TDA4VH <span class="hw-sep"> </span> TDA4AL <span class="hw-sep"> </span> AM69A </span>
+        J721S2<span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4VE-Q1">TDA4VE</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4VL-Q1">TDA4VL</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4AL-Q1">TDA4AL</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/AM68A">AM68A</a><span class="hw-sep"> </span>
+      </div>
+      <div class="hw-item">
+        J784S4<span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4VH-Q1">TDA4VH</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/TDA4AH-Q1">TDA4AH</a><span class="hw-sep"> </span>
+        <a href="https://www.ti.com/product/AM69A">AM69A</a><span class="hw-sep"> </span>
       </div>
     </div>
+    </strong>
   </div>
 
   <!-- Model Catalog -->
