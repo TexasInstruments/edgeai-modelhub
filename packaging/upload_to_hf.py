@@ -31,6 +31,13 @@ there — plain Markdown is what actually gets pushed). This keeps the two
 files from drifting apart without hand-editing both. Pass --org-card-source
 to push a specific file instead, bypassing generation entirely.
 
+Separately, --intro-card pushes packaging/INTRO_CARD.md to a different
+"<repo>/README" Space (default: TexasInstruments/README) — the umbrella TI
+org's landing card, distinct from --org-card's TexasInstruments-EdgeAI
+space. Unlike --org-card, this source file is never auto-generated: it's
+maintained by hand and already carries its own Space front matter. Pass
+--intro-card-source to push a different file instead.
+
 Usage:
     # Dry-run: preview files without uploading
     python upload_to_hf.py --repo-id myorg/edgeai-modelhub --model resnet --dry-run
@@ -64,6 +71,12 @@ Usage:
 
     # Upload models and the org card in the same run
     HF_TOKEN=hf_xxx python upload_to_hf.py --model all --org-card
+
+    # Push packaging/INTRO_CARD.md to the TexasInstruments/README space
+    HF_TOKEN=hf_xxx python upload_to_hf.py --intro-card
+
+    # Push a specific file as the intro card instead
+    HF_TOKEN=hf_xxx python upload_to_hf.py --intro-card --intro-card-source packaging/OTHER.md
 
 Note: --repo-id only applies when a single --model is given. With multiple
 models (or "all"), each model uploads to its own registered repo_id. The org
@@ -574,7 +587,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p.add_argument(
-        '--org-card-repo-id', default='TIEdgeAI/README', metavar='ORG/README',
+        '--org-card-repo-id', default='TexasInstruments-EdgeAI/README', metavar='ORG/README',
         help="Target Space repo for the organization card (default: %(default)s).",
     )
     p.add_argument(
@@ -619,6 +632,29 @@ def build_parser() -> argparse.ArgumentParser:
             'root (e.g. "README.md" instead of '
             '"models/vision/classification/resnet/README.md"). Default: on. '
             'Use --no-strip-prefix to preserve the full directory structure.'
+        ),
+    )
+    p.add_argument(
+        '--intro-card', action='store_true',
+        help=(
+            "Push a landing-page card to a separate '<org>/README' Space repo "
+            "(the umbrella TI org's card, distinct from --org-card's "
+            "TexasInstruments-EdgeAI space). Can be combined with --model / "
+            "--org-card, or used on its own."
+        ),
+    )
+    p.add_argument(
+        '--intro-card-repo-id', default='TexasInstruments/README', metavar='ORG/README',
+        help="Target Space repo for the intro card (default: %(default)s).",
+    )
+    p.add_argument(
+        '--intro-card-source', default='packaging/INTRO_CARD.md', metavar='PATH',
+        help=(
+            "Local markdown file to push as the intro card, relative to the "
+            "repo root unless an absolute path is given (default: "
+            "%(default)s). Unlike --org-card-source, this file is never "
+            "auto-generated — it's maintained by hand and must already carry "
+            "its own Space front matter."
         ),
     )
     return p
@@ -871,71 +907,45 @@ def _diff_against_remote(
     return to_upload, unchanged
 
 
-def upload_org_card(args: argparse.Namespace) -> bool:
+def push_card(
+    args: argparse.Namespace,
+    repo_id: str,
+    content: bytes,
+    source_dir: Path,
+    display_path,
+    label: str,
+    injected: bool = False,
+    write_back_path: Optional[Path] = None,
+    commit_message_default: str = "Update organization card",
+) -> bool:
     """
-    Push a local markdown file as this organization's landing-page card.
+    Shared push mechanics for a landing-page card (--org-card / --intro-card):
+    localize local asset references, stage README.md plus every referenced
+    asset, diff against the target Space repo, and upload (or preview, for
+    --dry-run).
 
-    The org card lives in a dedicated Space repo named "<org>/README"
-    (repo_type 'space', sdk 'static') — see
-    https://huggingface.co/docs/hub/organizations-cards. Only README.md
-    itself is touched: to_delete is intentionally always empty here, so
-    other files that may already exist in the Space (e.g. images added via
-    the web UI) are never removed just because this script doesn't know
-    about them.
+    The card lives in a dedicated Space repo named "<org>/README" (repo_type
+    'space', sdk 'static') — see
+    https://huggingface.co/docs/hub/organizations-cards. Only README.md and
+    its referenced assets are touched: deletion is intentionally never
+    performed here, so other files that may already exist in the Space
+    (e.g. images added via the web UI) are never removed just because this
+    script doesn't know about them.
 
-    A brand-new org card Space is always created Public — HF only renders
-    the card on the org's profile page when the Space is Public, so a
-    private one would silently do nothing. Returns True on success
-    (including dry-runs and no-op "already up to date" runs), False on
-    failure.
+    A brand-new card Space is always created Public — HF only renders the
+    card on the org's profile page when the Space is Public, so a private
+    one would silently do nothing. Returns True on success (including
+    dry-runs and no-op "already up to date" runs), False on failure.
 
-    When args.org_card_source is None (the default), packaging/ORG_CARD.md
-    is freshly regenerated in-memory from the repo root README.md via
-    generate_org_card.py before diffing/uploading, so the two files can
-    never silently drift apart. It's only written back to disk on an actual
-    (non-dry-run) push — --dry-run never touches local files, it only
-    previews. Pass --org-card-source explicitly to push a literal file
-    instead, bypassing generation entirely.
+    write_back_path: when given and this isn't a --dry-run, `content` is
+    written back to this path on disk after asset-URL localization — used by
+    --org-card's auto-generation flow to keep packaging/ORG_CARD.md in sync
+    with what was actually pushed. Pass None (the default) to never write
+    back, e.g. for a hand-maintained source file like INTRO_CARD.md.
     """
-    repo_id = args.org_card_repo_id
-    auto_generate = args.org_card_source is None
-
-    if auto_generate:
-        try:
-            import generate_org_card
-        except ImportError:
-            sys.path.insert(0, str(Path(__file__).resolve().parent))
-            import generate_org_card
-
-        source_path = generate_org_card.ORG_CARD_PATH
-        source_dir = source_path.parent
-        try:
-            readme_html = generate_org_card.README_PATH.read_text(encoding='utf-8')
-            content = generate_org_card.build_markdown(readme_html).encode('utf-8')
-        except (OSError, ValueError) as exc:
-            print(f"Error regenerating org card from README.md: {exc}")
-            return False
-        injected = False
-        display_path = f"{source_path.relative_to(REPO_ROOT)}  (regenerated from README.md)"
-    else:
-        source_path = Path(args.org_card_source)
-        if not source_path.is_absolute():
-            source_path = (REPO_ROOT / source_path).resolve()
-
-        if not source_path.is_file():
-            print(f"Error: org card source file not found: {source_path}")
-            return False
-
-        source_dir = source_path.parent
-        content, injected = compose_org_card_content(source_path)
-        try:
-            display_path = source_path.relative_to(REPO_ROOT)
-        except ValueError:
-            display_path = source_path
-
     content, assets = localize_org_card_assets(content, source_dir, repo_id)
 
-    print("Upload configuration — org card")
+    print(f"Upload configuration — {label}")
     print("=" * 60)
     print(f"  Source:       {display_path}")
     print(f"  Repository:   {repo_id}  (space)")
@@ -950,16 +960,15 @@ def upload_org_card(args: argparse.Namespace) -> bool:
             print(f"                  - {hf_path}")
     print()
 
-    # On a real (non-dry-run) auto-generated push, keep the checked-in
-    # packaging/ORG_CARD.md in sync with exactly what's about to be pushed
-    # (including rewritten asset URLs). Never done during --dry-run, which
-    # must not touch local files, and never done when --org-card-source was
-    # given explicitly, since that file is the user's own to manage.
-    if auto_generate and not args.dry_run:
-        source_path.parent.mkdir(parents=True, exist_ok=True)
-        source_path.write_bytes(content)
-        print(f"  Regenerated {source_path.relative_to(REPO_ROOT)} on disk "
-              f"({len(content)} bytes) from README.md.\n")
+    # On a real (non-dry-run) push, optionally keep a checked-in source file
+    # in sync with exactly what's about to be pushed (including rewritten
+    # asset URLs). Never done during --dry-run, which must not touch local
+    # files.
+    if write_back_path is not None and not args.dry_run:
+        write_back_path.parent.mkdir(parents=True, exist_ok=True)
+        write_back_path.write_bytes(content)
+        print(f"  Regenerated {write_back_path.relative_to(REPO_ROOT)} on disk "
+              f"({len(content)} bytes).\n")
 
     # Stage README.md (possibly front-matter-injected, with asset references
     # rewritten to absolute resolve URLs) plus every referenced local asset
@@ -1029,7 +1038,7 @@ def upload_org_card(args: argparse.Namespace) -> bool:
         remote_tree = get_remote_tree(api, repo_id, repo_type='space')
         to_upload, unchanged = _diff_against_remote(staged, remote_tree)
 
-        commit_message = args.commit_message or "Update organization card"
+        commit_message = args.commit_message or commit_message_default
 
         # ── Upload ──────────────────────────────────────────────────────────────
         try:
@@ -1048,11 +1057,108 @@ def upload_org_card(args: argparse.Namespace) -> bool:
     return True
 
 
+def upload_org_card(args: argparse.Namespace) -> bool:
+    """
+    Push a local markdown file as this organization's landing-page card.
+
+    When args.org_card_source is None (the default), packaging/ORG_CARD.md
+    is freshly regenerated in-memory from the repo root README.md via
+    generate_org_card.py before diffing/uploading, so the two files can
+    never silently drift apart. It's only written back to disk on an actual
+    (non-dry-run) push — --dry-run never touches local files, it only
+    previews. Pass --org-card-source explicitly to push a literal file
+    instead, bypassing generation entirely. See push_card() for the shared
+    upload mechanics.
+    """
+    repo_id = args.org_card_repo_id
+    auto_generate = args.org_card_source is None
+
+    if auto_generate:
+        try:
+            import generate_org_card
+        except ImportError:
+            sys.path.insert(0, str(Path(__file__).resolve().parent))
+            import generate_org_card
+
+        source_path = generate_org_card.ORG_CARD_PATH
+        source_dir = source_path.parent
+        try:
+            readme_html = generate_org_card.README_PATH.read_text(encoding='utf-8')
+            content = generate_org_card.build_markdown(readme_html).encode('utf-8')
+        except (OSError, ValueError) as exc:
+            print(f"Error regenerating org card from README.md: {exc}")
+            return False
+        injected = False
+        display_path = f"{source_path.relative_to(REPO_ROOT)}  (regenerated from README.md)"
+    else:
+        source_path = Path(args.org_card_source)
+        if not source_path.is_absolute():
+            source_path = (REPO_ROOT / source_path).resolve()
+
+        if not source_path.is_file():
+            print(f"Error: org card source file not found: {source_path}")
+            return False
+
+        source_dir = source_path.parent
+        content, injected = compose_org_card_content(source_path)
+        try:
+            display_path = source_path.relative_to(REPO_ROOT)
+        except ValueError:
+            display_path = source_path
+
+    return push_card(
+        args, repo_id, content, source_dir, display_path,
+        label='org card', injected=injected,
+        write_back_path=source_path if auto_generate else None,
+        commit_message_default='Update organization card',
+    )
+
+
+def upload_intro_card(args: argparse.Namespace) -> bool:
+    """
+    Push a local markdown file as a landing-page card to a separate
+    "<org>/README" Space repo (default: TexasInstruments/README) — the
+    umbrella TI org's card, distinct from --org-card's
+    TexasInstruments-EdgeAI space.
+
+    Unlike --org-card, the source file (default: packaging/INTRO_CARD.md)
+    is never auto-generated from README.md — it's maintained by hand and
+    must already carry its own Space front matter. See push_card() for the
+    shared upload mechanics.
+    """
+    repo_id = args.intro_card_repo_id
+
+    source_path = Path(args.intro_card_source)
+    if not source_path.is_absolute():
+        source_path = (REPO_ROOT / source_path).resolve()
+
+    if not source_path.is_file():
+        print(f"Error: intro card source file not found: {source_path}")
+        return False
+
+    source_dir = source_path.parent
+    content, injected = compose_org_card_content(source_path)
+    try:
+        display_path = source_path.relative_to(REPO_ROOT)
+    except ValueError:
+        display_path = source_path
+
+    return push_card(
+        args, repo_id, content, source_dir, display_path,
+        label='intro card', injected=injected,
+        write_back_path=None,
+        commit_message_default='Update intro card',
+    )
+
+
 def main() -> None:
     args = build_parser().parse_args()
 
-    if not args.model and not args.org_card:
-        sys.exit("Error: nothing to do — pass --model (one or more) and/or --org-card.")
+    if not args.model and not args.org_card and not args.intro_card:
+        sys.exit(
+            "Error: nothing to do — pass --model (one or more), --org-card, "
+            "and/or --intro-card."
+        )
 
     model_names = resolve_model_names(args.model) if args.model else []
 
@@ -1067,6 +1173,8 @@ def main() -> None:
     jobs: list[tuple[str, Callable[[], bool]]] = []
     if args.org_card:
         jobs.append(('org-card', lambda: upload_org_card(args)))
+    if args.intro_card:
+        jobs.append(('intro-card', lambda: upload_intro_card(args)))
     for name in model_names:
         jobs.append((name, lambda name=name: upload_model(name, args)))
 
