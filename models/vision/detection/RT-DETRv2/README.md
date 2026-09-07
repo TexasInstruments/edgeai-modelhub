@@ -95,11 +95,11 @@ The script automatically:
 - Exports to ONNX (opset 16 by default) and runs ONNX shape inference
 - Optionally applies `onnxsim` simplification when `--simplify` is passed
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -115,9 +115,13 @@ tidlrunner-cli infer --target_device J784S4 \
   --config_path /path/to/rtdetrv2_s_config.yaml
 ```
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -156,8 +160,8 @@ If you use RT-DETRv2 in your research, please cite:
 | **Paper** | [arXiv:2407.17140](https://arxiv.org/abs/2407.17140) |
 | **Original RT-DETR Paper** | [arXiv:2304.08069](https://arxiv.org/abs/2304.08069) |
 | **Source Code** | [lyuwenyu/RT-DETR](https://github.com/lyuwenyu/RT-DETR) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 | **EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |
 

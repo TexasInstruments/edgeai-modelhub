@@ -79,11 +79,11 @@ The script automatically:
 - Exports to ONNX (opset 13), fixes the batch dimension to 1, and re-runs shape inference
 - Optionally simplifies the model using `onnx-simplifier`
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -99,9 +99,13 @@ tidlrunner-cli infer --target_device J784S4 \
   --config_path /path/to/rtmdet_tiny_config.yaml
 ```
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -126,8 +130,8 @@ If you use RTMDet in your research, please cite:
 |----------|------|
 | **Paper** | [arXiv:2212.07784](https://arxiv.org/abs/2212.07784) |
 | **Source Code** | [open-mmlab/mmdetection (rtmdet configs)](https://github.com/open-mmlab/mmdetection/tree/main/configs/rtmdet) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 | **EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |
 

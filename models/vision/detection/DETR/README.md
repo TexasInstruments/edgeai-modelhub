@@ -87,11 +87,11 @@ The script automatically:
 
 > **Note:** DC5 (`_dc5`) variants are currently skipped by `prepare_model.py` with a warning, since TIDL does not yet support the dilated-conv backbone for compilation. The pre-exported `.onnx`/config artifacts for these variants remain in this folder for reference.
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -109,9 +109,13 @@ tidlrunner-cli infer --target_device J784S4 \
 
 Swap `detr_resnet50_config.yaml` for `detr_resnet50_dc5_config.yaml`, `detr_resnet101_config.yaml`, or `detr_resnet101_dc5_config.yaml` to compile/infer the other variants.
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -139,8 +143,8 @@ If you use these models, please cite:
 | **Source Code** | [facebookresearch/detr](https://github.com/facebookresearch/detr) |
 | **Blog Post** | [End-to-End Object Detection with Transformers](https://ai.facebook.com/blog/end-to-end-object-detection-with-transformers) |
 | **COCO Dataset** | [cocodataset.org](https://cocodataset.org) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 | **TI EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |
 
