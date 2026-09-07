@@ -591,7 +591,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Target Space repo for the organization card (default: %(default)s).",
     )
     p.add_argument(
-        '--org-card-source', default=None, metavar='PATH',
+        '--org-card-source', default="README.md", metavar='PATH',
         help=(
             "Local markdown file to push as the organization card, relative "
             "to the repo root unless an absolute path is given. If omitted "
