@@ -21,6 +21,13 @@ The Model Catalog's "Docs" links are rewritten from local repo-relative
 folder paths (e.g. "models/vision/classification/ResNet/") to the model's
 actual HF repo URL, looked up from MODEL_REGISTRY in upload_to_hf.py.
 
+Parsing approach: README.md is parsed into a small generic HTML tree (see
+_Node/_TreeBuilder below) rather than matched with per-section regexes, so
+card renderers query by tag/class instead of assuming an exact HTML shape.
+This keeps the script tolerant of routine README edits (extra wrapper divs,
+whitespace changes, a name moving in or out of a <strong>, etc.) — only a
+genuine removal of a card/section should require touching this script.
+
 Usage:
     # Regenerate packaging/ORG_CARD.md from README.md
     python packaging/generate_org_card.py
@@ -33,12 +40,10 @@ Usage:
 """
 
 import argparse
-import html
 import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Optional
 
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
@@ -68,113 +73,154 @@ GENERATED_NOTICE = (
 )
 
 
-# ── Inline HTML → Markdown ──────────────────────────────────────────────────
+# ── Generic HTML tree ────────────────────────────────────────────────────────
+#
+# A minimal DOM: each element is a _Node with a tag, attrs, and children
+# (a mix of _Node and plain text strings). Built with a stack-based
+# HTMLParser subclass so nesting (however deep — grids inside cards inside
+# the page) is tracked correctly, unlike a regex which has no concept of
+# "the matching closing tag."
 
-class _InlineMarkdownConverter(HTMLParser):
-    """
-    Convert a small, known-safe subset of inline HTML (as used throughout
-    README.md's card bodies) to Markdown: <a>, <strong>/<b>, <em>/<i>,
-    <code>, <br>. Any other tag is dropped but its text content is kept.
-    """
+_VOID_TAGS = {
+    'area', 'base', 'br', 'col', 'embed', 'hr', 'img',
+    'input', 'link', 'meta', 'param', 'source', 'track', 'wbr',
+}
 
+_INLINE_MARKUP = {
+    'a': lambda node: f'[{node.markdown()}]({node.attrs.get("href", "")})',
+    'strong': lambda node: f'**{node.markdown()}**',
+    'b': lambda node: f'**{node.markdown()}**',
+    'em': lambda node: f'_{node.markdown()}_',
+    'i': lambda node: f'_{node.markdown()}_',
+    'code': lambda node: f'`{node.markdown()}`',
+    'br': lambda node: ' ',
+}
+
+
+class _Node:
+    def __init__(self, tag, attrs=None, parent=None):
+        self.tag = tag
+        self.attrs = dict(attrs or ())
+        self.children = []  # list of _Node | str
+        self.parent = parent
+
+    @property
+    def classes(self):
+        return (self.attrs.get('class') or '').split()
+
+    def has_class(self, name):
+        return name in self.classes
+
+    def next_element_sibling(self):
+        """The next _Node sibling (skipping text nodes), or None."""
+        if self.parent is None:
+            return None
+        siblings = self.parent.children
+        idx = siblings.index(self)
+        for sib in siblings[idx + 1:]:
+            if isinstance(sib, _Node):
+                return sib
+        return None
+
+    def descendants(self):
+        """Yield all descendant _Nodes, depth-first, document order."""
+        for c in self.children:
+            if isinstance(c, _Node):
+                yield c
+                yield from c.descendants()
+
+    def find(self, tag=None, class_=None):
+        for n in self.descendants():
+            if (tag is None or n.tag == tag) and (class_ is None or n.has_class(class_)):
+                return n
+        return None
+
+    def find_all(self, tag=None, class_=None):
+        return [
+            n for n in self.descendants()
+            if (tag is None or n.tag == tag) and (class_ is None or n.has_class(class_))
+        ]
+
+    def text(self):
+        """Plain-text content, recursive, whitespace-collapsed. Drops all markup."""
+        parts = [c if isinstance(c, str) else c.text() for c in self.children]
+        return re.sub(r'\s+', ' ', ''.join(parts)).strip()
+
+    def raw_text(self):
+        """Plain-text content, recursive, whitespace preserved verbatim (for <pre>/<code>)."""
+        parts = [c if isinstance(c, str) else c.raw_text() for c in self.children]
+        return ''.join(parts)
+
+    def text_before(self, tag):
+        """Plain text of children up to (not including) the first child with `tag`."""
+        parts = []
+        for c in self.children:
+            if isinstance(c, _Node) and c.tag == tag:
+                break
+            parts.append(c if isinstance(c, str) else c.text())
+        return re.sub(r'\s+', ' ', ''.join(parts)).strip()
+
+    def markdown(self, skip=None):
+        """
+        Inline Markdown for this node's children: <a>/<strong>/<b>/<em>/<i>/
+        <code>/<br> are converted, any other tag is dropped but its own
+        text/markdown content is kept. `skip` is an optional set of child
+        _Node identities to omit entirely (e.g. a badge nested in a heading).
+        """
+        skip = skip or ()
+        out = []
+        for c in self.children:
+            if isinstance(c, str):
+                out.append(c)
+            elif c in skip:
+                continue
+            elif c.tag in _INLINE_MARKUP:
+                out.append(_INLINE_MARKUP[c.tag](c))
+            else:
+                out.append(c.markdown())
+        return ''.join(out)
+
+    def markdown_stripped(self, skip=None):
+        return re.sub(r'\s+', ' ', self.markdown(skip)).strip()
+
+
+class _TreeBuilder(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self._out: list[str] = []
-        self._href_stack: list[str] = []
+        self.root = _Node(None)
+        self._stack = [self.root]
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'a':
-            href = dict(attrs).get('href', '')
-            self._href_stack.append(href)
-            self._out.append('[')
-        elif tag in ('strong', 'b'):
-            self._out.append('**')
-        elif tag in ('em', 'i'):
-            self._out.append('_')
-        elif tag == 'code':
-            self._out.append('`')
-        elif tag == 'br':
-            self._out.append(' ')
+        parent = self._stack[-1]
+        node = _Node(tag, attrs, parent=parent)
+        parent.children.append(node)
+        if tag not in _VOID_TAGS:
+            self._stack.append(node)
 
     def handle_endtag(self, tag):
-        if tag == 'a' and self._href_stack:
-            href = self._href_stack.pop()
-            self._out.append(f']({href})')
-        elif tag in ('strong', 'b'):
-            self._out.append('**')
-        elif tag in ('em', 'i'):
-            self._out.append('_')
-        elif tag == 'code':
-            self._out.append('`')
+        for i in range(len(self._stack) - 1, 0, -1):
+            if self._stack[i].tag == tag:
+                del self._stack[i:]
+                return
+        # Unmatched close tag — ignore rather than raising, since README.md
+        # is well-formed HTML in practice and a stray tag shouldn't be fatal.
 
     def handle_data(self, data):
-        self._out.append(data)
-
-    def markdown(self) -> str:
-        return ''.join(self._out)
+        if data:
+            self._stack[-1].children.append(data)
 
 
-def inline_to_markdown(fragment: str) -> str:
-    """Convert an inner-HTML fragment to inline Markdown, collapsing whitespace."""
-    conv = _InlineMarkdownConverter()
-    conv.feed(fragment)
-    conv.close()
-    return re.sub(r'\s+', ' ', conv.markdown()).strip()
+def parse_html(text: str) -> _Node:
+    builder = _TreeBuilder()
+    builder.feed(text)
+    builder.close()
+    return builder.root
 
 
-# ── Balanced <div> extraction ───────────────────────────────────────────────
-#
-# Several cards contain nested <div> grids (uc-grid, tool-grid, hw-list,
-# res-grid), so a naive ".*?</div>" regex would stop at the first nested
-# closing tag instead of the card's own. These helpers track nesting depth
-# to find the real matching close tag instead.
-
-_DIV_TOKEN_RE = re.compile(r'<div\b|</div>')
-
-
-def extract_div_block(text: str, start_idx: int) -> tuple[str, int]:
-    """
-    Given the index just after an already-consumed '<div ...>' opening tag,
-    return (inner_html, index_just_after_the_matching_closing_tag).
-    """
-    depth = 1
-    for m in _DIV_TOKEN_RE.finditer(text, start_idx):
-        if m.group() == '<div':
-            depth += 1
-        else:
-            depth -= 1
-            if depth == 0:
-                return text[start_idx:m.start()], m.end()
-    raise ValueError("Unbalanced <div> tags while scanning README.md")
-
-
-_CARD_OPEN_RE = re.compile(r'<div class="card"[^>]*>')
-_H2_RE = re.compile(r'<h2>(.*?)</h2>', re.S)
-
-
-def iter_cards(text: str):
-    """Yield (heading_text, inner_html) for every top-level <div class="card">."""
-    for m in _CARD_OPEN_RE.finditer(text):
-        inner, _ = extract_div_block(text, m.end())
-        h2 = _H2_RE.search(inner)
-        heading = html.unescape(re.sub(r'<[^>]+>', '', h2.group(1))).strip() if h2 else None
-        yield heading, inner
-
-
-def extract_named_div(text: str, class_name: str) -> str:
-    """Return the inner HTML of the first <div class="{class_name}">...</div>."""
-    m = re.search(r'<div class="' + re.escape(class_name) + r'"[^>]*>', text)
-    if not m:
-        raise ValueError(f'generate_org_card.py: could not find <div class="{class_name}"> in README.md')
-    inner, _ = extract_div_block(text, m.end())
-    return inner
-
-
-def _extract(pattern: str, text: str) -> str:
-    m = re.search(pattern, text, re.S)
-    if not m:
-        raise ValueError(f"generate_org_card.py: pattern not found in README.md: {pattern[:60]}")
-    return m.group(1)
+def _require(node, what: str) -> _Node:
+    if node is None:
+        raise ValueError(f'generate_org_card.py: could not find {what} in README.md')
+    return node
 
 
 # ── MODEL_REGISTRY lookup (for Model Catalog "Docs" links) ─────────────────
@@ -187,32 +233,38 @@ def load_dir_to_repo() -> dict[str, str]:
 
 
 # ── Per-card renderers ───────────────────────────────────────────────────────
+#
+# Each renderer receives the card's _Node and queries it by tag/class rather
+# than assuming a fixed HTML shape, so routine README edits (an extra wrapper
+# div, a name moving in or out of a <strong>, whitespace changes) shouldn't
+# require changes here.
 
-def render_overview(inner: str) -> str:
-    para = inline_to_markdown(_extract(r'<p>\s*(.*?)\s*</p>', inner))
-    items = re.findall(r'<li>(.*?)</li>', inner, re.S)
-    bullets = '\n'.join(f'- {inline_to_markdown(i)}' for i in items)
+def render_overview(card: _Node) -> str:
+    p = card.find(tag='p')
+    para = p.markdown_stripped() if p else ''
+    items = card.find_all(tag='li')
+    bullets = '\n'.join(f'- {li.markdown_stripped()}' for li in items)
     return f"{para}\n\n{bullets}"
 
 
-def render_use_cases(inner: str) -> str:
-    items = re.findall(r'<h3>(.*?)</h3>', inner, re.S)
-    return ' · '.join(inline_to_markdown(i) for i in items)
+def render_use_cases(card: _Node) -> str:
+    items = card.find_all(tag='h3')
+    return ' · '.join(h.markdown_stripped() for h in items)
 
 
-def render_license_summary(inner: str) -> str:
-    intro = inline_to_markdown(_extract(r'<p>(.*?)</p>', inner))
+def render_license_summary(card: _Node) -> str:
+    p = card.find(tag='p')
+    intro = p.markdown_stripped() if p else ''
 
-    lic_matches = re.findall(r'<a([^>]*class="lic[^"]*"[^>]*)>(.*?)</a>', inner, re.S)
     lic_entries = []
-    for attrs, text in lic_matches:
-        href_m = re.search(r'href="([^"]+)"', attrs)
-        href = href_m.group(1) if href_m else '#'
-        lic_entries.append(f"**[{inline_to_markdown(text)}]({href})**")
+    for a in card.find_all(tag='a'):
+        if a.has_class('lic'):
+            href = a.attrs.get('href', '#')
+            lic_entries.append(f"**[{a.markdown_stripped()}]({href})**")
     lic_line = ' · '.join(lic_entries)
 
-    disclaimer_m = re.search(r'<div class="disclaimer">\s*(.*?)\s*</div>', inner, re.S)
-    disclaimer = inline_to_markdown(disclaimer_m.group(1)) if disclaimer_m else ''
+    disclaimer_div = card.find(tag='div', class_='disclaimer')
+    disclaimer = disclaimer_div.markdown_stripped() if disclaimer_div else ''
 
     paragraphs = [intro]
     if lic_line:
@@ -222,29 +274,39 @@ def render_license_summary(inner: str) -> str:
     return "\n\n".join(paragraphs)
 
 
-def render_compilation(inner: str) -> str:
-    cards = re.findall(r'<div class="tool-card">\s*(.*?)\s*</div>', inner, re.S)
+def render_compilation(card: _Node) -> str:
     rows = []
-    for card in cards:
-        h3 = _extract(r'<h3>(.*?)</h3>', card)
-        badge_m = re.search(r'<span[^>]*class="tool-badge"[^>]*>(.*?)</span>', h3, re.S)
-        badge = inline_to_markdown(badge_m.group(1)) if badge_m else None
-        name_html = re.sub(r'<span[^>]*class="tool-badge"[^>]*>.*?</span>', '', h3, flags=re.S)
-        name = inline_to_markdown(name_html)
-        desc = inline_to_markdown(_extract(r'<p>(.*?)</p>', card))
+    for tool_card in card.find_all(tag='div', class_='tool-card'):
+        h3 = _require(tool_card.find(tag='h3'), '<h3> inside a "tool-card"')
+        p = tool_card.find(tag='p')
+        badge_node = h3.find(tag='span', class_='tool-badge')
+        badge = badge_node.markdown_stripped() if badge_node else None
+        name = h3.markdown_stripped(skip={badge_node} if badge_node else None)
+        desc = p.markdown_stripped() if p else ''
         label = f"**{name}**" + (f" ({badge.lower()})" if badge else "")
         rows.append(f"| {label} | {desc} |")
     return "| Tool | Description |\n|------|-------------|\n" + "\n".join(rows)
 
 
-def render_quick_start(inner: str) -> str:
-    steps = re.findall(r'<p><strong>(.*?)</strong></p>\s*<pre><code>(.*?)</code></pre>', inner, re.S)
+def render_quick_start(card: _Node) -> str:
+    steps = []
+    for p in card.find_all(tag='p'):
+        nxt = p.next_element_sibling()
+        if nxt is None or nxt.tag != 'pre':
+            continue
+        strong = p.find(tag='strong') or p.find(tag='b')
+        title = strong.markdown_stripped() if strong else p.markdown_stripped()
+        code_node = nxt.find(tag='code')
+        code_text = (code_node or nxt).raw_text()
+        steps.append((title, code_text))
+
     if not steps:
         raise ValueError("generate_org_card.py: no Quick Start steps found in README.md")
+
     lines = ["```bash"]
     for title, code in steps:
-        lines.append(f"# {inline_to_markdown(title)}")
-        lines.append(html.unescape(code).strip())
+        lines.append(f"# {title}")
+        lines.append(code.strip())
         lines.append("")
     if lines[-1] == "":
         lines.pop()
@@ -252,51 +314,53 @@ def render_quick_start(inner: str) -> str:
     return "\n".join(lines)
 
 
-def render_hardware(inner: str) -> str:
-    intro = inline_to_markdown(_extract(r'<p>\s*(.*?)\s*</p>', inner))
-    items = re.findall(r'<div class="hw-item">\s*(.*?)\s*</div>', inner, re.S)
+def render_hardware(card: _Node) -> str:
+    p = card.find(tag='p')
+    intro = p.markdown_stripped() if p else ''
+
     rows = []
-    for item in items:
-        name = inline_to_markdown(_extract(r'<strong>(.*?)</strong>', item))
-        # Greedy: hw-aliases spans nest hw-sep spans inside them, so a non-greedy
-        # match would stop at the first (inner) </span> instead of the real one.
-        # Each hw-item has exactly one hw-aliases span, so grabbing up to the
-        # last </span> in `item` is safe and correct.
-        aliases_m = re.search(r'<span class="hw-aliases">(.*)</span>', item, re.S)
-        if aliases_m:
-            raw = re.sub(r'<span class="hw-sep">.*?</span>', '·', aliases_m.group(1), flags=re.S)
-            aliases = inline_to_markdown(raw)
-        else:
-            aliases = '—'
+    for item in card.find_all(tag='div', class_='hw-item'):
+        # The device family name is whatever text/​<strong> precedes the
+        # first <a>; aliases are simply every <a> in the item, wherever
+        # nested. This works whether the name is bare text or wrapped in
+        # <strong>, and whether aliases sit in a dedicated wrapper span or not.
+        name = item.text_before('a')
+        alias_links = item.find_all(tag='a')
+        aliases = ' · '.join(
+            f'[{a.markdown_stripped()}]({a.attrs.get("href", "")})' for a in alias_links
+        ) if alias_links else '—'
         rows.append(f"| **{name}** | {aliases} |")
+
     table = "| Device | Aliases |\n|--------|---------|\n" + "\n".join(rows)
     return f"{intro}\n\n{table}"
 
 
-def render_model_catalog(inner: str, dir_to_repo: dict[str, str]) -> str:
-    headers = [inline_to_markdown(h) for h in re.findall(r'<th>(.*?)</th>', inner, re.S)]
-    headers = ['Repo' if h == 'Docs' else h for h in headers]
+def render_model_catalog(card: _Node, dir_to_repo: dict[str, str]) -> str:
+    thead = card.find(tag='thead')
+    headers = [th.markdown_stripped() for th in thead.find_all(tag='th')] if thead else []
+    docs_idx = next((i for i, h in enumerate(headers) if h.strip().lower() == 'docs'), None)
+    if docs_idx is not None:
+        headers[docs_idx] = 'Repo'
 
-    tbody = _extract(r'<tbody>(.*?)</tbody>', inner)
-    rows_html = re.findall(r'<tr>\s*(.*?)\s*</tr>', tbody, re.S)
-
+    tbody = card.find(tag='tbody')
     md_rows = []
-    for row in rows_html:
-        cells = re.findall(r'<td>(.*?)</td>', row, re.S)
+    for tr in (tbody.find_all(tag='tr') if tbody else []):
+        cells = tr.find_all(tag='td')
         rendered = []
         for i, cell in enumerate(cells):
-            if i == len(cells) - 1:
-                href_m = re.search(r'href="([^"]+)"', cell)
-                local_dir = href_m.group(1).rstrip('/') if href_m else None
+            if i == docs_idx:
+                a = cell.find(tag='a')
+                href = a.attrs.get('href') if a else None
+                local_dir = href.rstrip('/') if href else None
                 repo_id = dir_to_repo.get(local_dir) if local_dir else None
                 if repo_id:
                     rendered.append(f"[View](https://huggingface.co/{repo_id})")
                 else:
                     print(f"  Warning: no MODEL_REGISTRY entry for catalog link '{local_dir}' "
                           "— leaving link as originally written.")
-                    rendered.append(inline_to_markdown(cell))
+                    rendered.append(cell.markdown_stripped())
             else:
-                rendered.append(inline_to_markdown(cell))
+                rendered.append(cell.markdown_stripped())
         md_rows.append('| ' + ' | '.join(rendered) + ' |')
 
     header_line = '| ' + ' | '.join(headers) + ' |'
@@ -304,13 +368,13 @@ def render_model_catalog(inner: str, dir_to_repo: dict[str, str]) -> str:
     return '\n'.join([header_line, sep_line] + md_rows)
 
 
-def render_resources(inner: str) -> str:
-    cards = re.findall(r'<div class="res-card">\s*(.*?)\s*</div>', inner, re.S)
+def render_resources(card: _Node) -> str:
     lines = []
-    for card in cards:
-        category = inline_to_markdown(_extract(r'<h3>(.*?)</h3>', card))
-        links = re.findall(r'<a\s+href="([^"]+)"[^>]*>(.*?)</a>', card, re.S)
-        link_md = ' · '.join(f'[{inline_to_markdown(t)}]({href})' for href, t in links)
+    for res_card in card.find_all(tag='div', class_='res-card'):
+        h3 = res_card.find(tag='h3')
+        category = h3.markdown_stripped() if h3 else ''
+        links = res_card.find_all(tag='a')
+        link_md = ' · '.join(f'[{a.markdown_stripped()}]({a.attrs.get("href", "")})' for a in links)
         lines.append(f"- **{category}:** {link_md}")
     return '\n'.join(lines)
 
@@ -327,24 +391,28 @@ SECTION_RENDERERS = [
 ]
 
 
-# ── Footer ───────────────────────────────────────────────────────────────────
+# ── Card discovery ───────────────────────────────────────────────────────────
 
-def extract_footer_line(text: str) -> str:
-    m = re.search(r'<div class="footer">\s*<p>(.*?)</p>', text, re.S)
-    if not m:
-        raise ValueError('generate_org_card.py: could not find <div class="footer"> in README.md')
-    return inline_to_markdown(m.group(1))
+def iter_cards(root: _Node):
+    """Yield (heading_text, card_node) for every <div class="card"> in the document."""
+    for div in root.find_all(tag='div', class_='card'):
+        h2 = div.find(tag='h2')
+        heading = h2.text() if h2 else None
+        yield heading, div
 
 
 # ── Assembly ─────────────────────────────────────────────────────────────────
 
 def build_markdown(readme_html: str) -> str:
-    cards = dict(iter_cards(readme_html))
+    root = parse_html(readme_html)
+    cards = dict(iter_cards(root))
 
-    hero_inner = extract_named_div(readme_html, 'hero')
-    hero_title = inline_to_markdown(_extract(r'<h1[^>]*>(.*?)</h1>', hero_inner))
-    hero_tagline = inline_to_markdown(_extract(r'<p[^>]*>(.*?)</p>', hero_inner))
-    footer_line = extract_footer_line(readme_html)
+    hero = _require(root.find(tag='div', class_='hero'), '<div class="hero">')
+    hero_title = _require(hero.find(tag='h1'), '<h1> inside the hero').markdown_stripped()
+    hero_tagline = _require(hero.find(tag='p'), '<p> inside the hero').markdown_stripped()
+
+    footer = _require(root.find(tag='div', class_='footer'), '<div class="footer">')
+    footer_line = _require(footer.find(tag='p'), '<p> inside the footer').markdown_stripped()
 
     dir_to_repo = load_dir_to_repo()
 
@@ -367,12 +435,12 @@ def build_markdown(readme_html: str) -> str:
     ]
 
     for heading, renderer, extra_kwargs in SECTION_RENDERERS:
-        inner = cards.get(heading)
-        if inner is None:
+        card = cards.get(heading)
+        if card is None:
             print(f"  Warning: card '{heading}' not found in README.md — skipping that section.")
             continue
         kwargs = {name: dir_to_repo for name in extra_kwargs}
-        body = renderer(inner, **kwargs)
+        body = renderer(card, **kwargs)
         parts += ["", f"## {heading}", "", body, "", "---"]
 
     parts += [

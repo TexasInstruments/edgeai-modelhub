@@ -11,7 +11,7 @@ pinned: false
 
 <div align="center">
 
-<img src="https://huggingface.co/spaces/TIEdgeAI/README/resolve/main/docs/assets/TXN-Logo.png" alt="Texas Instruments" width="72" height="72" />
+<img src="../docs/assets/TXN-Logo.png" alt="Texas Instruments" width="72" height="72" />
 
 # EdgeAI Model Hub
 
@@ -23,7 +23,7 @@ pinned: false
 
 ## Overview
 
-The TI EdgeAI Model Hub is a curated repository of open-source computer vision models optimized for deployment on Texas Instruments MPU devices. Models are compiled for TI hardware using [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) or [TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools), enabling production-ready inference without cloud dependency.
+The TI EdgeAI Model Hub is a curated repository of open-source computer vision models optimized for deployment on Texas Instruments MPU devices. Models are compiled for TI hardware using [TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools) or [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner), enabling production-ready inference without cloud dependency. For more details on TIDL Model compilation options, Runtimes and Operators supported etc, see the [TIDL User Guide](https://github.com/TexasInstruments/edgeai-tidl-tools#user-guide)
 
 - Hardware-optimized for TI MPU processors
 - Benchmarked on real TI hardware
@@ -85,11 +85,11 @@ Compatible TI MPU device families compiled and validated via TIDL. See the suppo
 
 | Device | Aliases |
 |--------|---------|
-| **AM62A** | — |
-| **J722S** | TDA4AEN · AM67A |
-| **J721E** | TDA4VM |
-| **J721S2** | TDA4VL · TDA4AL · AM68A |
-| **J784S4** | TDA4VH · TDA4AL · AM69A |
+| **AM62A** | [AM62A3](https://www.ti.com/product/AM62A3) · [AM62A7](https://www.ti.com/product/AM62A7) |
+| **J722S** | [TDA4AEN](https://www.ti.com/product/TDA4AEN-Q1) · [AM67A](https://www.ti.com/product/AM67A) |
+| **J721E** | [TDA4VM](https://www.ti.com/product/TDA4VM) |
+| **J721S2** | [TDA4VE](https://www.ti.com/product/TDA4VE-Q1) · [TDA4VL](https://www.ti.com/product/TDA4VL-Q1) · [TDA4AL](https://www.ti.com/product/TDA4AL-Q1) · [AM68A](https://www.ti.com/product/AM68A) |
+| **J784S4** | [TDA4VH](https://www.ti.com/product/TDA4VH-Q1) · [TDA4AH](https://www.ti.com/product/TDA4AH-Q1) · [AM69A](https://www.ti.com/product/AM69A) |
 
 ---
 
