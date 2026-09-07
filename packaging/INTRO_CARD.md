@@ -29,7 +29,7 @@ pinned: false
 <details open>
 edgeai-modelhub is a collection of example pre-trained AI models for TI edge devices — with easy scripts and config files for compilation, benchmark and deployment.
 
-- Optimized for TI MPU processors
+- Optimized for TI MPU devices
 - Benchmarked on real TI hardware
 - Portable across various TI MPU devices
 - Automated scripts for model compilation, benchmark & deployment

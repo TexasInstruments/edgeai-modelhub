@@ -13,14 +13,14 @@
 ## Overview
 
 The TI EdgeAI Model Hub is a curated repository of open-source computer vision models
-optimized for deployment on Texas Instruments MPU devices. Models are compiled for TI hardware
+optimized for deployment on Texas Instruments Micro Processor devices. Models are compiled for TI hardware
 using [edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)
 or [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner),
 enabling production-ready inference without cloud dependency. For more details on TIDL model
 compilation options, runtimes, and supported operators, see the
 [TIDL User Guide](https://github.com/TexasInstruments/edgeai-tidl-tools#user-guide).
 
-- ✅ Optimized for TI MPU processors
+- ✅ Optimized for TI MPU devices
 - ✅ Benchmarked on real TI hardware
 - ✅ Portable across all various TI MPU devices
 - ✅ Automated scripts for model compilation, benchmark & deployment
