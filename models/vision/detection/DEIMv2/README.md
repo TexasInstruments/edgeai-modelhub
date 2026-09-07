@@ -161,11 +161,11 @@ def postprocess(pred_boxes, pred_logits, image_h, image_w, threshold=CONFIDENCE_
     return np.stack([x1, y1, x2, y2], axis=1), labels[keep], scores[keep]
 ```
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -183,9 +183,13 @@ tidlrunner-cli infer --target_device J784S4 \
 
 > Replace `deimv2_s_config.yaml` with `deimv2_m_config.yaml` to compile/infer the `deimv2_m` variant. To evaluate accuracy instead of just compiling, replace `compile` with `evaluate`.
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -214,8 +218,8 @@ If you use these models, please cite:
 | **HGNetv2 Backbone** | [Peterande/HGNetv2](https://github.com/Peterande/HGNetv2) |
 | **DINOv3 Backbone** | [facebookresearch/dinov3](https://github.com/facebookresearch/dinov3) |
 | **COCO Dataset** | [cocodataset.org](https://cocodataset.org) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 
 ---

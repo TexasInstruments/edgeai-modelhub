@@ -14,8 +14,8 @@
 
 The TI EdgeAI Model Hub is a curated repository of open-source computer vision models
 optimized for deployment on Texas Instruments MPU devices. Models are compiled for TI hardware
-using [TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools)
-or [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner),
+using [edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)
+or [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner),
 enabling production-ready inference without cloud dependency. For more details on TIDL model
 compilation options, runtimes, and supported operators, see the
 [TIDL User Guide](https://github.com/TexasInstruments/edgeai-tidl-tools#user-guide).
@@ -47,8 +47,8 @@ Models in this hub are distributed under various open-source licenses — each m
 
 | Tool | Description |
 |------|-------------|
-| **[TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner)** (Recommended) | High-level compilation interface suitable for most users and standard deployment workflows. |
-| **[TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools)** | Low-level compilation framework for advanced users and custom workflows. |
+| **[edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner)** (Recommended) | High-level compilation and benchmark interface. |
+| **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)** | Deployment tools (and also low-level compilation tools for advanced users). |
 
 ## Quick Start
 
@@ -77,6 +77,10 @@ cd /path/to/edgeai-tidlrunner
 tidlrunner-cli infer --target_device <device> \
   --config_path /path/to/edgeai-modelhub/<model>_config.yaml
 ```
+
+## Deployment
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
+
 
 ## Supported Hardware
 
@@ -116,7 +120,7 @@ Compatible TI MPU device families compiled and validated via TIDL. See the suppo
 ## Resources & Links
 
 - **Ecosystem:** [TI EdgeAI](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu) · [EdgeAI SDK](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md)
-- **Tools:** [TIDL Runner](https://github.com/TexasInstruments/edgeai-tidlrunner) · [TIDL Tools](https://github.com/TexasInstruments/edgeai-tidl-tools)
+- **Tools:** [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) · [edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)
 - **Community:** [E2E Support](https://e2e.ti.com/support/processors-group/processors/f/processors-forum) · [Issues](https://github.com/TexasInstruments/edgeai/issues) · [Discussions](https://github.com/TexasInstruments/edgeai/discussions)
 
 ---

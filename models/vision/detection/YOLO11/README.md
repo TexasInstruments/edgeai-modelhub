@@ -93,11 +93,11 @@ The script automatically:
 - Fixes dynamic input dimensions to a static shape (default `[1, 3, 640, 640]`)
 - Runs ONNX shape inference and optional `onnx-simplifier` optimization, then validates the result
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -115,9 +115,13 @@ tidlrunner-cli infer --target_device J784S4 \
 
 To evaluate accuracy instead, replace `infer` with `evaluate` in the command above.
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -145,8 +149,8 @@ Ultralytics has not published a formal research paper for YOLO11 due to the rapi
 |----------|------|
 | **Source Code** | [ultralytics/ultralytics](https://github.com/ultralytics/ultralytics) |
 | **Documentation** | [YOLO11 Docs](https://docs.ultralytics.com/models/yolo11/) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 | **EdgeAI MPU Overview** | [GitHub](https://github.com/TexasInstruments/edgeai/tree/main/edgeai-mpu) |
 | **TI EdgeAI Ecosystem** | [GitHub](https://github.com/TexasInstruments/edgeai) |

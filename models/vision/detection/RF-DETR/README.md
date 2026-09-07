@@ -87,11 +87,11 @@ The script automatically:
 - Exports the selected variant(s) to ONNX (opset 17 by default, static batch dimension)
 - Saves the result as `rfdetr_<variant>.onnx` in the output directory
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -107,9 +107,13 @@ tidlrunner-cli infer --target_device J784S4 \
   --config_path /path/to/rfdetr_nano_config.yaml
 ```
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -137,8 +141,8 @@ If you use RF-DETR in your research, please cite:
 | **RF-DETR Source Code** | [roboflow/rf-detr](https://github.com/roboflow/rf-detr) |
 | **RF-DETR Documentation** | [rfdetr.roboflow.com](https://rfdetr.roboflow.com) |
 | **RF-DETR on HuggingFace** | [huggingface.co/roboflow](https://huggingface.co/roboflow) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 
 ---

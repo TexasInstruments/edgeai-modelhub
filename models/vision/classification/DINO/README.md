@@ -81,11 +81,11 @@ The script automatically:
 - Exports to ONNX (opset 17) and fixes input shapes to [1, 3, 224, 224]
 - Validates the model outputs `[1, 1000]` class logits
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -101,9 +101,13 @@ tidlrunner-cli infer --target_device J784S4 \
   --config_path /path/to/dino_vits16_config.yaml
 ```
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -131,8 +135,8 @@ If you use these models, please cite:
 |----------|------|
 | **Paper** | [arXiv:2104.14294](https://arxiv.org/abs/2104.14294) |
 | **Source Code** | [facebookresearch/dino](https://github.com/facebookresearch/dino) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 | **DINOv2** | [Improved successor](../DINOv2/) |
 

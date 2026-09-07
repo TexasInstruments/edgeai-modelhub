@@ -89,11 +89,11 @@ The script automatically:
 - Exports to ONNX (opset 17 by default), simplifies the graph with onnx-simplifier, and fixes float64 nodes for TIDL compatibility
 - Validates the exported graph and saves it as `<model_key>.onnx`
 
-### Compile and Infer uing TIDL Runner
+### Compile and Infer uing edgeai-tidlrunner
 
 > **Note:** Run the commands below from inside the `tidlrunner` directory (the cloned [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner) repository), with `--config_path` pointing to this model's config file.
 
-**Compile using TIDL Runner - on PC**
+**Compile using edgeai-tidlrunner - on PC**
 
 ```bash
 cd /path/to/edgeai-tidlrunner
@@ -109,9 +109,13 @@ tidlrunner-cli infer --target_device J784S4 \
   --config_path /path/to/deformable_detr_single_scale_config.yaml
 ```
 
-### Compile and Infer using TIDL Tools (Advanced):
+### Compile and Infer using edgeai-tidl-tools (Advanced):
 
 Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
+
+### Deploy using edgeai-tidl-tools:
+
+Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
 
 ---
 
@@ -136,8 +140,8 @@ Follow the instructions at https://github.com/TexasInstruments/edgeai-tidl-tools
 | **Paper** | [arXiv:2010.04159](https://arxiv.org/abs/2010.04159) |
 | **Source Code** | [fundamentalvision/Deformable-DETR](https://github.com/fundamentalvision/Deformable-DETR) |
 | **Dataset** | [COCO](https://cocodataset.org) |
-| **TIDL Tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
-| **TIDL Runner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
+| **edgeai-tidl-tools** | [GitHub](https://github.com/TexasInstruments/edgeai-tidl-tools) |
+| **edgeai-tidlrunner** | [GitHub](https://github.com/TexasInstruments/edgeai-tidlrunner) |
 | **EdgeAI SDK** | [Documentation](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) |
 
 ---
