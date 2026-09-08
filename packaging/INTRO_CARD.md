@@ -18,7 +18,7 @@ pinned: false
 </div>
 
 ---
-## TI Edge-AI for Microprocessor devices with C7 NPU
+## TI Edge-AI for Microprocessor devices
 [![Models](https://img.shields.io/badge/Models-50%2B-brightgreen)](https://huggingface.co/TexasInstruments-EdgeAI) [![Hardware](https://img.shields.io/badge/Hardware-TI%20MPUs%20With%20C7%20NPU-brightgreen)](https://huggingface.co/TexasInstruments-EdgeAI) [![License](https://img.shields.io/badge/License-Open%20Source-brightgreen)](https://huggingface.co/TexasInstruments-EdgeAI)
 
 Bring Your Own Models and deploy on Texas Instruments Micro Processors with C7 NPU acceleration
@@ -26,13 +26,13 @@ Bring Your Own Models and deploy on Texas Instruments Micro Processors with C7 N
 **[TI Edge-AI Model Hub →](https://huggingface.co/TexasInstruments-EdgeAI)** — pre-trained AI models for TI edge devices, with scripts & configs for compilation, benchmark and deployment.
 - Optimized, benchmarked on real hardware & portable across TI MPU devices; automated compile/benchmark/deploy scripts
 - Image classification (ResNet, ViT, ConvNeXt, DINO/DINOv2, MobileNetV3) & object detection (YOLO11/26/v8/X, RT-DETRv2, RTMDet, RF-DETR, DETR & more)
-- Validated on C7 NPU SOCs: AM62A, TDA4AEN/AM67A, TDA4VM, TDA4VE/TDA4VL/AM68A, TDA4VH/AM69A
+- Validated on SOCs with C7 NPU: AM62A, TDA4AEN/AM67A, TDA4VM, TDA4VE/TDA4VL/AM68A, TDA4VH/AM69A
 - Use cases: Automotive · Aerospace & Defense · Industrial · Surveillance · Robotics · Edge IoT
 
 ---
 
 ## TI MCU-AI for Microcontrollers Devices
-[![Devices](https://img.shields.io/badge/MCU%20Devices-MSP%20%7C%20AM13%20%7C%20C2000%20%7C%20Radar-brightgreen)](https://github.com/TexasInstruments/tinyml-modelzoo) [![GUI Tooling](https://img.shields.io/badge/GUI%20Tooling-Edge%20AI%20Studio-brightgreen)](https://www.ti.com/tool/EDGE-AI-STUDIO)
+[![Devices](https://img.shields.io/badge/MCU%20Devices-MSPM0%20%7C%20MSPM33C%20%7C%20AM1x%20%7C%20AM26x%20%7C%20C2000%20%7C%20Radar%20%7C%20Connectivity-brightgreen)](https://github.com/TexasInstruments/tinyml-modelzoo) [![GUI Tooling](https://img.shields.io/badge/GUI%20Tooling-Edge%20AI%20Studio-brightgreen)](https://www.ti.com/tool/EDGE-AI-STUDIO)
 
 Bring Your Own Data or Bring Your Own Models and deploy on TI microcontrollers, connectivity devices & radar sensors
 

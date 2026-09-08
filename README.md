@@ -4,7 +4,7 @@
 
 # EdgeAI Model Hub
 
-**Pre-trained, hardware-optimized AI models for TI edge devices**
+**Pre-trained, hardware-optimized, edge AI models for TI Microprocessor devices**
 
 </div>
 
@@ -13,16 +13,18 @@
 ## Overview
 
 The TI EdgeAI Model Hub is a curated repository of open-source computer vision models
-optimized for deployment on Texas Instruments Micro Processor devices. Models are compiled for TI hardware
+optimized for deployment on Texas Instruments Microprocessor devices. 
+
+Models are compiled for TI hardware
 using [edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)
 or [edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner),
 enabling production-ready inference without cloud dependency. For more details on TIDL model
 compilation options, runtimes, and supported operators, see the
 [TIDL User Guide](https://github.com/TexasInstruments/edgeai-tidl-tools#user-guide).
 
+- ✅ Portable across various devices
 - ✅ Optimized for TI MPU devices
-- ✅ Benchmarked on real TI hardware
-- ✅ Portable across all various TI MPU devices
+- ✅ Benchmarked on a variety of TI MPU devices with C7 NPU
 - ✅ Automated scripts for model compilation, benchmark & deployment
 
 ## Use Cases
@@ -43,11 +45,25 @@ Models in this hub are distributed under various open-source licenses — each m
 > regarding the suitability of these licenses for any particular purpose and accepts no legal
 > responsibility for the user's compliance obligations.
 
+## Supported Hardware
+
+Compatible TI MPU device families compiled and validated via TIDL. See the supported devices, SDKs and version compatibility at the
+[EdgeAI developer landing space](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) and the
+[edgeai-tidl-tools SDK version compatibility matrix](https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/docs/sdk_version_compatibility_table.md).
+
+| Device Family | Variants |
+|---|---|
+| **AM62A** | [AM62A3](https://www.ti.com/product/AM62A3) · [AM62A7](https://www.ti.com/product/AM62A7) |
+| **J722S** | [TDA4AEN](https://www.ti.com/product/TDA4AEN-Q1) · [AM67A](https://www.ti.com/product/AM67A) |
+| **J721E** | [TDA4VM](https://www.ti.com/product/TDA4VM) |
+| **J721S2** | [TDA4VE](https://www.ti.com/product/TDA4VE-Q1) · [TDA4VL](https://www.ti.com/product/TDA4VL-Q1) · [TDA4AL](https://www.ti.com/product/TDA4AL-Q1) · [AM68A](https://www.ti.com/product/AM68A) |
+| **J784S4** | [TDA4VH](https://www.ti.com/product/TDA4VH-Q1) · [TDA4AH](https://www.ti.com/product/TDA4AH-Q1) · [AM69A](https://www.ti.com/product/AM69A) |
+
 ## Compilation & Deployment
 
 | Tool | Description |
 |------|-------------|
-| **[edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner)** (Recommended) | High-level compilation and benchmark interface. |
+| **[edgeai-tidlrunner](https://github.com/TexasInstruments/edgeai-tidlrunner)** | High-level compilation and benchmark interface. (Recommended for compilation and benchmark) |
 | **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)** | Deployment tools (and also low-level compilation tools for advanced users). |
 
 ## Quick Start
@@ -80,21 +96,6 @@ tidlrunner-cli infer --target_device <device> \
 
 ## Deployment
 Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstruments/edgeai-tidl-tools)**. For ONNX models, onnxruntime-tidl with TIDL acceleration can be used. Consult the documentation of edgeai-tidl-tools for more details.
-
-
-## Supported Hardware
-
-Compatible TI MPU device families compiled and validated via TIDL. See the supported devices, SDKs and version compatibility at the
-[EdgeAI developer landing space](https://github.com/TexasInstruments/edgeai/blob/main/edgeai-mpu/readme_sdk.md) and the
-[edgeai-tidl-tools SDK version compatibility matrix](https://github.com/TexasInstruments/edgeai-tidl-tools/blob/master/docs/sdk_version_compatibility_table.md).
-
-| Device Family | Variants |
-|---|---|
-| **AM62A** | [AM62A3](https://www.ti.com/product/AM62A3) · [AM62A7](https://www.ti.com/product/AM62A7) |
-| **J722S** | [TDA4AEN](https://www.ti.com/product/TDA4AEN-Q1) · [AM67A](https://www.ti.com/product/AM67A) |
-| **J721E** | [TDA4VM](https://www.ti.com/product/TDA4VM) |
-| **J721S2** | [TDA4VE](https://www.ti.com/product/TDA4VE-Q1) · [TDA4VL](https://www.ti.com/product/TDA4VL-Q1) · [TDA4AL](https://www.ti.com/product/TDA4AL-Q1) · [AM68A](https://www.ti.com/product/AM68A) |
-| **J784S4** | [TDA4VH](https://www.ti.com/product/TDA4VH-Q1) · [TDA4AH](https://www.ti.com/product/TDA4AH-Q1) · [AM69A](https://www.ti.com/product/AM69A) |
 
 ## Model Catalog
 
