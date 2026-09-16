@@ -34,7 +34,7 @@ YOLO11 is offered in five size variants — n, s, m, l, x — spanning a wide ac
 
 ## Model Variants
 
-| Model | Params (M) | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+| Model | Params (M) | Input Size | Reference mAP[.5:.95]% | Validated Devices | Config |
 |-------|------------|------------|--------------|--------------------|--------|
 | `yolo11n` | 2.6 | 640×640 | 39.5 | TDA4VH, TDA4VL | [yolo11n_model_config.yaml](yolo11n_model_config.yaml) |
 | `yolo11s` | 9.4 | 640×640 | 47.0 | TDA4VH, TDA4VL | [yolo11s_model_config.yaml](yolo11s_model_config.yaml) |

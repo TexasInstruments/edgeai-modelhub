@@ -38,7 +38,7 @@ These ONNX models include the **full backbone + pretrained linear classification
 
 ## Model Variants
 
-| Model | Architecture | Params | Linear Top-1 | k-NN Top-1 | Validated Devices | Config |
+| Model | Architecture | Params | Reference Linear Top-1 | Reference k-NN Top-1 | Validated Devices | Config |
 |-------|-------------|--------|-------------|-----------|----------|--------|
 | `dino_vits16` | ViT-S/16 | 21M | 77.0% | 74.5% | TDA4VH | [dino_vits16_config.yaml](dino_vits16_config.yaml) |
 | `dino_vits8`  | ViT-S/8  | 21M | 79.7% | 78.3% | TDA4VH | [dino_vits8_config.yaml](dino_vits8_config.yaml) |

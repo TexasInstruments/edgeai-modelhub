@@ -33,7 +33,7 @@ Pretrained weights are sourced from **torchvision** (BSD-3-Clause), trained on I
 
 ## Model Variants
 
-| Model | Architecture | Params | Top-1 Acc | Validated Devices | Config |
+| Model | Architecture | Params | Reference Top-1 Acc | Validated Devices | Config |
 |-------|-------------|--------|-----------|--------------------|--------|
 | `vit_b_16` | ViT-Base/16 | 86.6M | 81.1% | TDA4VH | [vit_b_16_config.yaml](vit_b_16_config.yaml) |
 | `vit_b_32` | ViT-Base/32 | 88.2M | 75.9% | TDA4VH | [vit_b_32_config.yaml](vit_b_32_config.yaml) |

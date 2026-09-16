@@ -36,7 +36,7 @@ DEIMv2 spans eight model sizes from ultra-light (`Atto`) to extra-large (`X`), c
 
 ## Model Variants
 
-| Model | Backbone | Input Size | Params(M) | mAP[.5:.95]% | Validated Devices | Config |
+| Model | Backbone | Input Size | Params(M) | Reference mAP[.5:.95]% | Validated Devices | Config |
 |-------|----------|------------|-----------|--------------|--------------------|--------|
 | `deimv2_atto` | HGNetv2-Atto | 320×320 | 0.5 | 23.8 | N/A | N/A |
 | `deimv2_femto` | HGNetv2-Femto | 416×416 | 1.0 | 31.0 | N/A | N/A |

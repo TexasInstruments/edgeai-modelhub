@@ -34,7 +34,7 @@ This model is optimized for deployment on **Texas Instruments edge devices**, pr
 
 ## Model Variants
 
-| Model | Model ID | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+| Model | Model ID | Input Size | Reference mAP[.5:.95]% | Validated Devices | Config |
 |-------|----------|------------|--------------|--------------------|--------|
 | `yolox_nano` | `od-mh8009` | 416×416 | 24.8 | TDA4VH, TDA4VL | [yolox_nano_config.yaml](yolox_nano_config.yaml) |
 | `yolox_tiny` | `od-mh8010` | 416×416 | 32.8 | TDA4VH, TDA4VL | [yolox_tiny_config.yaml](yolox_tiny_config.yaml) |

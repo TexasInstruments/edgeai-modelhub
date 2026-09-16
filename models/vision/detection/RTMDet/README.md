@@ -32,7 +32,7 @@ This RTMDet model is optimized for **Texas Instruments MPU (Microprocessor Unit)
 
 ## Model Variants
 
-| Model | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+| Model | Input Size | Reference mAP[.5:.95]% | Validated Devices | Config |
 |-------|-----------|--------------|--------------------|--------|
 | `rtmdet_tiny` | 640x640 | 40.9 | TDA4VH | [rtmdet_tiny_config.yaml](rtmdet_tiny_config.yaml) |
 | `rtmdet_s` | 640x640 | 44.5 | TDA4VH | [rtmdet_s_config.yaml](rtmdet_s_config.yaml) |

@@ -34,7 +34,7 @@ All variants are released under the Apache 2.0 license.
 
 ## Model Variants
 
-| Model | Backbone | Params (M) | FLOPs (G) | mAP[.5:.95]% | mAP[.50]% | Validated Devices | Config |
+| Model | Backbone | Params (M) | FLOPs (G) | Reference mAP[.5:.95]% | Reference mAP[.50]% | Validated Devices | Config |
 |-------|----------|-----------|-----------|--------------|-----------|--------------------|--------|
 | `rtdetrv2_s` | ResNet-18vd | 20 | 60 | 48.1 | 65.1 | TDA4VH | [rtdetrv2_s_config.yaml](rtdetrv2_s_config.yaml) |
 | `rtdetrv2_ms` | ResNet-34vd | 31 | 92 | 49.9 | 67.5 | TDA4VH | [rtdetrv2_ms_config.yaml](rtdetrv2_ms_config.yaml) |

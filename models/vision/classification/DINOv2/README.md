@@ -36,7 +36,7 @@ All models use a **ViT/14** patch size (14x14 patches) and are evaluated at **22
 
 ## Model Variants
 
-| Model | Architecture | Params | GFLOPs | Top-1 Acc | Validated Devices | Config |
+| Model | Architecture | Params | GFLOPs | Reference Top-1 Acc | Validated Devices | Config |
 |-------|-------------|--------|--------|-----------|----------|--------|
 | `dinov2_vits14_lc` | ViT-S/14 distilled | 21M | 4.6 | 81.1% | TDA4VH | [dinov2_vits14_lc_config.yaml](dinov2_vits14_lc_config.yaml) |
 | `dinov2_vits14_reg_lc` | ViT-S/14 distilled + registers | 21M | 4.6 | 80.9% | TDA4VH | [dinov2_vits14_reg_lc_config.yaml](dinov2_vits14_reg_lc_config.yaml) |

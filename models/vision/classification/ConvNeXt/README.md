@@ -35,7 +35,7 @@ All variants take a **224×224** input with ImageNet normalization (mean=[0.485,
 
 ## Model Variants
 
-| Model | Architecture | Params | GFLOPs | Top-1 Acc | Top-5 Acc | Validated Devices | Config |
+| Model | Architecture | Params | GFLOPs | Reference Top-1 Acc | Reference Top-5 Acc | Validated Devices | Config |
 |-------|-------------|--------|--------|-----------|-----------|--------------------|--------|
 | `convnext_tiny`  | ConvNeXt-Tiny  | 28.6M  |  4.46 | **82.52%** | 96.15% | TDA4VH | [convnext_tiny_config.yaml](convnext_tiny_config.yaml) |
 | `convnext_small` | ConvNeXt-Small | 50.2M  |  8.68 | **83.62%** | 96.65% | TDA4VH | [convnext_small_config.yaml](convnext_small_config.yaml) |

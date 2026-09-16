@@ -36,7 +36,7 @@ These ONNX models cover the five COCO-pretrained detection scales (n/s/m/l/x, 80
 
 ## Model Variants
 
-| Model | Input Size | mAP[.5:.95]% | Validated Devices | Config |
+| Model | Input Size | Reference mAP[.5:.95]% | Validated Devices | Config |
 |-------|-----------|--------------|--------------------|--------|
 | `yolo26n` | 640×640 | 40.9 | TDA4VH, TDA4VL | [yolo26n_model_config.yaml](yolo26n_model_config.yaml) |
 | `yolo26s` | 640×640 | 48.6 | TDA4VH, TDA4VL | [yolo26s_model_config.yaml](yolo26s_model_config.yaml) |

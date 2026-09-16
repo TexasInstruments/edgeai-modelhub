@@ -34,7 +34,7 @@ Both variants are evaluated at **224×224** input resolution on **ImageNet-1K** 
 
 ## Model Variants
 
-| Model | Architecture | Params | GFLOPs | Top-1 Acc | Top-5 Acc | Validated Devices | Config |
+| Model | Architecture | Params | GFLOPs | Reference Top-1 Acc | Reference Top-5 Acc | Validated Devices | Config |
 |-------|---------------|--------|--------|-----------|-----------|--------------------|--------|
 | `mobilenetv3_large` | MobileNetV3-Large | 5.48M | 0.22 | **75.274%** | 92.566% | TDA4VH | [mobilenetv3_large_config.yaml](mobilenetv3_large_config.yaml) |
 | `mobilenetv3_small` | MobileNetV3-Small | 2.54M | 0.06 | 67.668% | 87.402% | N/A | N/A |

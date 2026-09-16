@@ -99,7 +99,7 @@ Deplyment can be done using **[edgeai-tidl-tools](https://github.com/TexasInstru
 
 ## Model Catalog
 
-| Model | Capability | Variants | Input | Performance | License | Docs |
+| Model | Capability | Variants | Input | Reference Performance | License | Docs |
 |---|---|---|---|---|---|---|
 | **MobileNetV3** | Image Classification | large | 224×224 | 75.3% Top-1 | [![BSD-3-Clause](https://img.shields.io/badge/BSD--3--Clause-065f46?style=flat-square)](https://opensource.org/licenses/BSD-3-Clause) | [View](models/vision/classification/MobileNetV3/) |
 | **ResNet-50** | Image Classification | v1.5, v1 | 224×224 | 74.93–76.15% Top-1 | [![Apache 2.0](https://img.shields.io/badge/Apache%202.0-1d4ed8?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0) | [View](models/vision/classification/ResNet/) |

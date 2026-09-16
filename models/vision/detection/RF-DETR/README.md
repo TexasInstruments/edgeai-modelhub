@@ -33,7 +33,7 @@ RF-DETR ships in six size variants, Nano through 2XLarge, for flexible accuracy-
 
 ## Model Variants
 
-| Model | Input Size | mAP[.5:.95]% | mAP[.50]% | Validated Devices | Config |
+| Model | Input Size | Reference mAP[.5:.95]% | Reference mAP[.50]% | Validated Devices | Config |
 |-------|-----------|--------------|-----------|--------------------|--------|
 | `rfdetr_nano` | 384×384 | 48.4 | 67.6 | TDA4VH | [rfdetr_nano_config.yaml](rfdetr_nano_config.yaml) |
 | `rfdetr_small` | 512×512 | 53.0 | 72.1 | TDA4VH | [rfdetr_small_config.yaml](rfdetr_small_config.yaml) |

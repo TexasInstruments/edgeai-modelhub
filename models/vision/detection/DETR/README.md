@@ -35,7 +35,7 @@ This export covers the four ResNet-backbone **detection** variants (`detr_resnet
 
 ## Model Variants
 
-| Model | Backbone | mAP[.5:.95]% | mAP[.50]% | Validated Devices | Config |
+| Model | Backbone | Reference mAP[.5:.95]% | Reference mAP[.50]% | Validated Devices | Config |
 |-------|----------|-------------|-----------|--------------------|--------|
 | `detr_resnet50` | ResNet-50 | 42.0 | 62.4 | TDA4VH | [detr_resnet50_config.yaml](detr_resnet50_config.yaml) |
 | `detr_resnet50_dc5` | ResNet-50 DC5 | 43.3 | 63.1 | TDA4VH | [detr_resnet50_dc5_config.yaml](detr_resnet50_dc5_config.yaml) |

@@ -34,7 +34,7 @@ Deformable DETR uses **300 query slots** (vs. 100 in DETR) and **sigmoid focal l
 
 ## Model Variants
 
-| Model | Params | FLOPs | mAP[.5:.95]% | Validated Devices | Config |
+| Model | Params | FLOPs | Reference mAP[.5:.95]% | Validated Devices | Config |
 |-------|--------|-------|--------------|--------------------|--------|
 | `deformable_detr_single_scale` | 34M | 78G | 39.4 | TDA4VH | [deformable_detr_single_scale_config.yaml](deformable_detr_single_scale_config.yaml) |
 | `deformable_detr_single_scale_dc5` | 34M | 128G | 41.5 | N/A | N/A |
