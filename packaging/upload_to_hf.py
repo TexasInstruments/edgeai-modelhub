@@ -33,7 +33,7 @@ to push a specific file instead, bypassing generation entirely.
 
 Separately, --intro-card pushes packaging/INTRO_CARD.md to a different
 "<repo>/README" Space (default: TexasInstruments/README) — the umbrella TI
-org's landing card, distinct from --org-card's TexasInstruments-EdgeAI
+org's landing card, distinct from --org-card's TexasInstruments
 space. Unlike --org-card, this source file is never auto-generated: it's
 maintained by hand and already carries its own Space front matter. Pass
 --intro-card-source to push a different file instead.
@@ -142,7 +142,7 @@ EXCLUDE_FILENAME_PATTERNS: tuple[str, ...] = (
 # "<org>/README" Space fails with "Missing configuration in README".
 ORG_CARD_FRONT_MATTER = (
     "---\n"
-    "title: TIEdgeAI\n"
+    "title: TexasInstruments\n"
     "emoji: 🤖\n"
     "colorFrom: red\n"
     "colorTo: gray\n"
@@ -159,82 +159,82 @@ ORG_CARD_FRONT_MATTER = (
 MODEL_REGISTRY: dict[str, dict] = {
     'resnet': {
         'dir':         'models/vision/classification/ResNet',
-        'repo_id':     'TIEdgeAI/ResNet-Classification',
+        'repo_id':     'TexasInstruments/ResNet-Classification',
         'description': 'ResNet-50 ONNX models for TI EdgeAI deployment',
     },
     'convnext': {
         'dir':         'models/vision/classification/ConvNeXt',
-        'repo_id':     'TIEdgeAI/ConvNeXt-Classification',
+        'repo_id':     'TexasInstruments/ConvNeXt-Classification',
         'description': 'ConvNeXt ONNX models for TI EdgeAI deployment',
     },
     'dino': {
         'dir':         'models/vision/classification/DINO',
-        'repo_id':     'TIEdgeAI/DINO-Classification',
+        'repo_id':     'TexasInstruments/DINO-Classification',
         'description': 'DINO ONNX models for TI EdgeAI deployment',
     },
     'dinov2': {
         'dir':         'models/vision/classification/DINOv2',
-        'repo_id':     'TIEdgeAI/DINOv2-Classification',
+        'repo_id':     'TexasInstruments/DINOv2-Classification',
         'description': 'DINOv2 ONNX models for TI EdgeAI deployment',
     },
     'mobilenetv3': {
         'dir':         'models/vision/classification/MobileNetV3',
-        'repo_id':     'TIEdgeAI/MobileNetV3-Classification',
+        'repo_id':     'TexasInstruments/MobileNetV3-Classification',
         'description': 'MobileNetV3 ONNX models for TI EdgeAI deployment',
     },
     'vit': {
         'dir':         'models/vision/classification/ViT',
-        'repo_id':     'TIEdgeAI/ViT-Classification',
+        'repo_id':     'TexasInstruments/ViT-Classification',
         'description': 'ViT ONNX models for TI EdgeAI deployment',
     },
     'yolo11': {
         'dir':         'models/vision/detection/YOLO11',
-        'repo_id':     'TIEdgeAI/YOLO11-Detection',
+        'repo_id':     'TexasInstruments/YOLO11-Detection',
         'description': 'YOLO11 object detection ONNX models for TI EdgeAI',
     },
     'yolo26': {
         'dir':         'models/vision/detection/YOLO26',
-        'repo_id':     'TIEdgeAI/YOLO26-Detection',
+        'repo_id':     'TexasInstruments/YOLO26-Detection',
         'description': 'YOLO26 object detection ONNX models for TI EdgeAI',
     },
     'yolov8': {
         'dir':         'models/vision/detection/YOLOv8',
-        'repo_id':     'TIEdgeAI/YOLOv8-Detection',
+        'repo_id':     'TexasInstruments/YOLOv8-Detection',
         'description': 'YOLOv8 object detection ONNX models for TI EdgeAI',
     },
     'yolox': {
         'dir':         'models/vision/detection/YOLOX',
-        'repo_id':     'TIEdgeAI/YOLOX-Detection',
+        'repo_id':     'TexasInstruments/YOLOX-Detection',
         'description': 'YOLOX object detection ONNX models for TI EdgeAI',
     },
     'rtmdet': {
         'dir':         'models/vision/detection/RTMDet',
-        'repo_id':     'TIEdgeAI/RTMDet-Detection',
+        'repo_id':     'TexasInstruments/RTMDet-Detection',
         'description': 'RTMDet object detection ONNX models for TI EdgeAI',
     },
     'deformable_detr': {
         'dir':         'models/vision/detection/Deformable-DETR',
-        'repo_id':     'TIEdgeAI/Deformable-DETR-Detection',
+        'repo_id':     'TexasInstruments/Deformable-DETR-Detection',
         'description': 'Deformable DETR object detection ONNX models for TI EdgeAI',
     },
     'deimv2': {
         'dir':         'models/vision/detection/DEIMv2',
-        'repo_id':     'TIEdgeAI/DEIMv2-Detection',
+        'repo_id':     'TexasInstruments/DEIMv2-Detection',
         'description': 'DEIMv2 object detection ONNX models for TI EdgeAI',
     },
     'detr': {
         'dir':         'models/vision/detection/DETR',
-        'repo_id':     'TIEdgeAI/DETR-Detection',
+        'repo_id':     'TexasInstruments/DETR-Detection',
         'description': 'DETR object detection ONNX models for TI EdgeAI',
     },
     'rfdetr': {
         'dir':         'models/vision/detection/RF-DETR',
-        'repo_id':     'TIEdgeAI/RF-DETR-Detection',
+        'repo_id':     'TexasInstruments/RF-DETR-Detection',
         'description': 'RF-DETR object detection ONNX models for TI EdgeAI',
     },
     'rtdetrv2': {
         'dir':         'models/vision/detection/RT-DETRv2',
-        'repo_id':     'TIEdgeAI/RT-DETRv2-Detection',
+        'repo_id':     'TexasInstruments/RT-DETRv2-Detection',
         'description': 'RT-DETRv2 object detection ONNX models for TI EdgeAI',
     },
     # 'clip': {
@@ -587,7 +587,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p.add_argument(
-        '--org-card-repo-id', default='TexasInstruments-EdgeAI/README', metavar='ORG/README',
+        '--org-card-repo-id', default='TexasInstruments/README', metavar='ORG/README',
         help="Target Space repo for the organization card (default: %(default)s).",
     )
     p.add_argument(
@@ -639,7 +639,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Push a landing-page card to a separate '<org>/README' Space repo "
             "(the umbrella TI org's card, distinct from --org-card's "
-            "TexasInstruments-EdgeAI space). Can be combined with --model / "
+            "TexasInstruments space). Can be combined with --model / "
             "--org-card, or used on its own."
         ),
     )
@@ -1119,7 +1119,7 @@ def upload_intro_card(args: argparse.Namespace) -> bool:
     Push a local markdown file as a landing-page card to a separate
     "<org>/README" Space repo (default: TexasInstruments/README) — the
     umbrella TI org's card, distinct from --org-card's
-    TexasInstruments-EdgeAI space.
+    TexasInstruments space.
 
     Unlike --org-card, the source file (default: packaging/INTRO_CARD.md)
     is never auto-generated from README.md — it's maintained by hand and
