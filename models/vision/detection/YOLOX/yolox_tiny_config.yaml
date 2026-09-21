@@ -37,7 +37,7 @@ session:
 postprocess:
   reshape_list: null
   formatter:
-      name: DetectionXYWH2XYXYCenterXY
+      name: DetectionXYWHDetectionCenterXYWH2XYXY2XYXYCenterXY
   resize_with_pad:
   - true
   - center

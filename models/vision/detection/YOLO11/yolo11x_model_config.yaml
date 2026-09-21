@@ -42,7 +42,7 @@ postprocess:
   # detection_threshold: 0.001
   reshape_list: null
   formatter: 
-      name: DetectionXYWH2XYXYCenterXY
+      name: DetectionCenterXYWH2XYXY
   resize_with_pad:
   - true
   - center

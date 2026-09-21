@@ -3,10 +3,14 @@ dataloader:
   name: coco_detection_dataloader
   path: ./data/datasets/coco
 preprocess:
-  resize: 384
-  crop: 384
+  resize:
+  - 384
+  - 384
+  crop:
+  - 384
+  - 384
   data_layout: NCHW
-  reverse_channels: true
+  reverse_channels: false
   backend: cv2
   interpolation: null
   resize_with_pad: false
@@ -35,7 +39,7 @@ session:
 postprocess:
   reshape_list: null
   formatter:
-    name: DetectionXYWH2XYXYCenterXY
+    name: DetectionCenterXYWH2XYXY
   resize_with_pad: false
   normalized_detections: true
   shuffle_indices: null
